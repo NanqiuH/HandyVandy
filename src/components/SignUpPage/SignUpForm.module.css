@@ -1,0 +1,99 @@
+.signUpForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background-color: #ececec;
+  border-radius: 5px;
+  padding: 8px 15px;
+}
+
+.inputIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.inputLabel {
+  font-size: 12px;
+  font-weight: 400;
+  color: #2f2f2f;
+}
+
+.inputField {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2f2f2f;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+.showPasswordButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.showPasswordIcon {
+  width: 13px;
+  height: 13px;
+}
+
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  margin-top: 15px;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #2f2f2f;
+}
+
+.checkbox {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  border: 1px solid #d9d9d9;
+  background-color: #ececec;
+}
+
+.forgotPassword {
+  color: #6358dc;
+  text-decoration: none;
+}
+
+.signUpButton {
+  background-color: #6358dc;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4.894px;
+  padding: 14px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.registerPrompt {
+  color: #000;
+  font-size: 15px;
+  font-weight: 400;
+  text-align: center;
+  margin-top: 23px;
+}
+
+.registerLink {
+  color: #6358dc;
+  text-decoration: none;
+}
