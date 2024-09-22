@@ -2,6 +2,8 @@ import React from "react";
 import styles from "./SignUpForm.module.css";
 import { auth } from "../../firebase";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import MailIcon from '@mui/icons-material/Mail';
+import KeyIcon from '@mui/icons-material/Key';
 
 
 function SignUpForm() {
@@ -21,9 +23,7 @@ function SignUpForm() {
   return (
     <form className={styles.signUpForm}>
       <div className={styles.inputGroup}>
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/7f65d88181ae42d16aa43a5531f407ea156f2892534f6416f224206a5af6657d?placeholderIfAbsent=true&apiKey=ab96c5d4fce1429daf3cb89ddde9b564"
-          alt=""
+        <MailIcon
           className={styles.inputIcon}
         />
         <div>
@@ -40,9 +40,7 @@ function SignUpForm() {
         </div>
       </div>
       <div className={styles.inputGroup}>
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/e17105234a61a5e65b38643d6839ec49f79a18ba8c0f4faaf9b26ffff9a82da7?placeholderIfAbsent=true&apiKey=ab96c5d4fce1429daf3cb89ddde9b564"
-          alt=""
+        <KeyIcon
           className={styles.inputIcon}
         />
         <div>
@@ -62,11 +60,6 @@ function SignUpForm() {
           className={styles.showPasswordButton}
           aria-label="Show password"
         >
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/ecae4e524ae80f29be7102f00507dfba80562e9ff064196045453288345870a6?placeholderIfAbsent=true&apiKey=ab96c5d4fce1429daf3cb89ddde9b564"
-            alt=""
-            className={styles.showPasswordIcon}
-          />
         </button>
       </div>
       <div className={styles.formOptions}>

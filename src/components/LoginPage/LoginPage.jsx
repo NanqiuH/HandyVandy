@@ -10,7 +10,7 @@ function LoginPage() {
         <div className={styles.content}>
           <section className={styles.imageSection}>
             <img
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/11df6178d800c59a94f8ef7690653a529164ac2a61395df29f7042987e31e588?placeholderIfAbsent=true&apiKey=ab96c5d4fce1429daf3cb89ddde9b564"
+              src="loginHero.png"
               alt="HandyVandy illustration"
               className={styles.heroImage}
             />
