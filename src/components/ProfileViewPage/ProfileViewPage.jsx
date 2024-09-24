@@ -22,12 +22,29 @@ function ProfileViewPage() {
             </h1>
           </header>
           <div className={styles.profileContent}>
-            <img
-              src={profile.profileImage}
-              alt={`${profile.firstName} ${profile.lastName}`}
-              className={styles.profileImage}
-            />
-            <p className={styles.bio}>{profile.bio}</p>
+            <div className={styles.profileSidebar}>
+              <img
+                src={profile.profileImage}
+                alt={`${profile.firstName} ${profile.lastName}`}
+                className={styles.profileImage}
+              />
+              <div className={styles.profileInfo}>
+                <div className={styles.rating}>{"⭐️⭐️⭐️⭐️⭐️"}</div>
+                <button className={styles.friendButton}>Send Friend Request</button>
+              </div>
+            </div>
+            <div className={styles.profileDetails}>
+              <h2 className={styles.bioTitle}>Bio</h2>
+              <p className={styles.bio}>{profile.bio}</p>
+              <h3 className={styles.postsTitle}>Posts</h3>
+              <ul className={styles.postsList}>
+                {profile.posts.map((post) => (
+                  <li key={post.id} className={styles.postItem}>
+                    {post.title} - ${post.price}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </main>
