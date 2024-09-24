@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";  // Import Link for navigation
 import styles from "./ProfileListPage.module.css";
 import profiles from "../../dummy-data/dummy-data.jsx"
 
-
 function ProfileListPage() {
   return (
     <main className={styles.profileListPage}>
@@ -24,11 +23,13 @@ function ProfileListPage() {
                   alt={`${profile.firstName} ${profile.lastName}`}
                   className={styles.profileImage}
                 />
-                <div className={styles.profileDetails}>
-                  <h2 className={styles.profileName}>
-                    {profile.firstName} {profile.middleName} {profile.lastName}
-                  </h2>
-                  <p className={styles.profileBio}>{profile.bio}</p>
+                <div className={styles.profileCardContent}>
+                  <div className={styles.profileDetails}>
+                    <h2 className={styles.profileName}>
+                      {profile.firstName} {profile.middleName} {profile.lastName}
+                    </h2>
+                    <p className={styles.profileBio}>{profile.bio}</p>
+                  </div>
                 </div>
               </div>
             </Link>
