@@ -1,0 +1,38 @@
+.header {
+  background-color: #C5B783;
+  color: #000;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav {
+  display: flex;
+  gap: 5px;
+}
+
+.logoButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.logoImage {
+  height: 40px;
+  width: auto;
+}
+
+button {
+  background-color: #000;
+  color: #C5B783;
+}
+
+button:hover {
+  background-color: #C5B783;
+  color: #000;
+  cursor: pointer;
+}

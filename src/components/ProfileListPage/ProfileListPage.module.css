@@ -34,7 +34,7 @@
 
 .profileCard {
   display: flex;
-  flex-direction: column; /* Change from row to column */
+  flex-direction: column;
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -43,7 +43,7 @@
   align-items: center;
   background-color: #fff;
   margin-bottom: 1rem;
-  text-align: center; /* Center text below the image */
+  text-align: center;
 }
 
 .profileImage {
@@ -51,7 +51,7 @@
   height: 250px;
   border-radius: 00%;
   object-fit: cover;
-  margin-bottom: 15px; /* Add space between image and details */
+  margin-bottom: 15px;
 }
 
 .profileCardContent {
