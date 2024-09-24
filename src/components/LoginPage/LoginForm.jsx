@@ -2,20 +2,24 @@ import React from "react";
 import styles from "./LoginForm.module.css";
 import { auth } from "../../firebase";
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import MailIcon from '@mui/icons-material/Mail';
 import KeyIcon from '@mui/icons-material/Key';
 
 function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
       e.preventDefault();
       try {
           await signInWithEmailAndPassword(auth, email, password);
           console.log('Login successfully');
+          navigate('/');
       } catch (error) {
           console.error(error);
+          alert('Login failed. Please check your email and password.');
       }
   }
 

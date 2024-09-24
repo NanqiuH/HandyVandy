@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./SignUpForm.module.css";
 import { auth } from "../../firebase";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import MailIcon from '@mui/icons-material/Mail';
 import KeyIcon from '@mui/icons-material/Key';
 
@@ -9,14 +10,24 @@ import KeyIcon from '@mui/icons-material/Key';
 function SignUpForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      alert('Email and password cannot be empty.');
+      return;
+    }
+    
     try {
         createUserWithEmailAndPassword(auth, email, password);
         console.log('User created successfully');
+        navigate('/login');
+        alert('User created successfully');
     } catch (error) {
         console.error(error);
+        alert('User creation failed. Please check your email and password.');
     }
   }
 
