@@ -3,11 +3,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height:max-content;
   width: 100vw;  
   margin: 0;     
-  padding: 0;   
+  padding: 0; 
+  padding-top: 40px;
 }
+
 
 .container {
   width: 928px;
@@ -49,6 +51,7 @@
 
 .welcomeText {
   font-family: Pridi, sans-serif;
+  color: #2f2f2f;
   font-weight: 500;
   font-size: 26px;
 }
@@ -57,7 +60,7 @@
   font-family: Pridi, sans-serif;
   font-weight: 700;
   font-size: 35px;
-  color: #6358dc;
+  color: #2f2f2f;
 }
 
 .divider {

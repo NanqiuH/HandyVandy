@@ -69,12 +69,13 @@
 }
 
 .forgotPassword {
-  color: #6358dc;
+  color: #C5B783;
   text-decoration: none;
 }
 
 .loginButton {
-  background-color: #6358dc;
+  background-color:#C5B783;
+  /* background-color: #6358dc; */
   color: #fff;
   font-size: 15px;
   font-weight: 600;
@@ -94,6 +95,6 @@
 }
 
 .registerLink {
-  color: #6358dc;
+  color: #C5B783;
   text-decoration: none;
 }

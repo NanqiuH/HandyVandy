@@ -2,9 +2,11 @@ import React from "react";
 import styles from "./LoginPage.module.css";
 import LoginForm from "./LoginForm";
 import SocialLogin from "./SocialLogin";
+import Layout from "../Layout/Layout";
 
 function LoginPage() {
   return (
+    <Layout>  
     <main className={styles.loginPage}>
       <div className={styles.container}>
         <div className={styles.content}>
@@ -36,6 +38,7 @@ function LoginPage() {
         </div>
       </div>
     </main>
+    </Layout>
   );
 }
 

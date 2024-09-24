@@ -2,9 +2,11 @@ import React from "react";
 import styles from "./SignUpPage.module.css";
 import SignUpForm from "./SignUpForm";
 import SocialSignUp from "./SocialSignUp";
+import Layout from "../Layout/Layout";
 
 function SignUpPage() {
   return (
+    <Layout>
     <main className={styles.signUpPage}>
       <div className={styles.container}>
         <div className={styles.content}>
@@ -36,6 +38,7 @@ function SignUpPage() {
         </div>
       </div>
     </main>
+    </Layout>
   );
 }
 
