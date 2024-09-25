@@ -16,7 +16,7 @@ function LoginForm() {
       try {
           await signInWithEmailAndPassword(auth, email, password);
           console.log('Login successfully');
-          navigate('/');
+          navigate('/profile-list');
       } catch (error) {
           console.error(error);
           alert('Login failed. Please check your email and password.');

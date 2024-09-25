@@ -23,7 +23,7 @@ function SignUpForm() {
     try {
         createUserWithEmailAndPassword(auth, email, password);
         console.log('User created successfully');
-        navigate('/login');
+        navigate('/create-profile');
         alert('User created successfully');
     } catch (error) {
         console.error(error);

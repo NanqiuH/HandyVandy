@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";  // Import useNavigate from React Router
 import styles from "./CreateProfilePage.module.css";
 import Layout from "../Layout/Layout"
+import { db } from "../../firebase";
 
 function CreateProfilePage() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ function CreateProfilePage() {
   });
 
   const navigate = useNavigate();
+  // const currentUser = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,7 +31,7 @@ function CreateProfilePage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
     navigate("/");
