@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";  // Import useNavigate from Reac
 import styles from "./CreateProfilePage.module.css";
 import Layout from "../Layout/Layout"
 import { db } from "../../firebase";
+import { auth } from "../../firebase";
+import { storage } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function CreateProfilePage() {
   const [formData, setFormData] = useState({
@@ -14,7 +18,6 @@ function CreateProfilePage() {
   });
 
   const navigate = useNavigate();
-  // const currentUser = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,9 +35,36 @@ function CreateProfilePage() {
   };
 
   const handleSubmit = async (e) => {
+    // e.preventDefault();
+    // console.log(formData);
     e.preventDefault();
-    console.log(formData);
-    navigate("/");
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      let profileImageUrl = null;
+      if (formData.profileImage) {
+        const storageRef = ref(storage, `profileImages/${formData.profileImage.name}`);
+        await uploadBytes(storageRef, formData.profileImage);
+        profileImageUrl = await getDownloadURL(storageRef);
+      }
+
+      await setDoc(doc(db, "profiles", user.uid), {
+        firstName: formData.firstName,
+        middleName: formData.middleName,
+        lastName: formData.lastName,
+        bio: formData.bio,
+        profileImageUrl: profileImageUrl,
+      });
+
+      alert("Profile created successfully");
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   };
 
   return (
