@@ -6,6 +6,7 @@ import LoginPage from './components/LoginPage/LoginPage';
 import CreateProfilePage from './components/CreateProfilePage/CreateProfilePage';
 import ProfileListPage from './components/ProfileListPage/ProfileListPage';
 import ProfileViewPage from './components/ProfileViewPage/ProfileViewPage';
+import CreatePostingPage from './components/CreatePostingPage/CreatePostingPage';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path='/create-profile' element={<CreateProfilePage />} />
         <Route path='/profile-list' element={<ProfileListPage />} />
         <Route path="/profile/:id" element={<ProfileViewPage />} />
+        <Route path='/create-posting' element={<CreatePostingPage />} />
 
       </Routes>
     </BrowserRouter>
