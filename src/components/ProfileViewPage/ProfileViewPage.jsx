@@ -1,47 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+import { doc, getDoc } from "firebase/firestore"; // Firestore methods
+import { db } from "../../firebase"; // Firebase config
 import styles from "./ProfileViewPage.module.css";
-import Layout from "../Layout/Layout";
+import Header from "../Layout/Header";
 
 function ProfileViewPage() {
-  const { id } = useParams();
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams(); // Get the profile ID from the URL
+  const [profile, setProfile] = useState(null); // State to hold the profile data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const docRef = doc(db, "profiles", id);
-        const docSnap = await getDoc(docRef);
+        const profileRef = doc(db, "profiles", id); // Reference to the specific document
+        const profileSnap = await getDoc(profileRef); // Fetch the document
 
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
+        if (profileSnap.exists()) {
+          setProfile(profileSnap.data()); // Set the profile data
         } else {
-          console.log("No such document!");
-          setProfile(null);
+          setError("Profile not found.");
         }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setError("Failed to load profile.");
       } finally {
-        setLoading(false);
+        setLoading(false); // Stop loading once the data is fetched
       }
     };
 
     fetchProfile();
-  }, [id]);
+  }, [id]); // Fetch the profile whenever the ID changes
 
   if (loading) {
     return <p>Loading...</p>;
   }
 
-  if (!profile) {
-    return <p>Profile not found.</p>;
+  if (error) {
+    return <p>{error}</p>;
   }
 
   return (
-    <Layout>
+    <div>
+      <Header />
       <main className={styles.profileDetailPage}>
         <div className={styles.container}>
           <header className={styles.header}>
@@ -58,17 +60,31 @@ function ProfileViewPage() {
               />
               <div className={styles.profileInfo}>
                 <div className={styles.rating}>{"⭐️⭐️⭐️⭐️⭐️"}</div>
-                <button className={styles.friendButton}>Send Friend Request</button>
+                <button className={styles.friendButton}>
+                  Send Friend Request
+                </button>
               </div>
             </div>
             <div className={styles.profileDetails}>
-              <p>{profile.bio}</p>
-              {/* Add more profile details here as needed */}
+              <h2 className={styles.bioTitle}>Bio</h2>
+              <p className={styles.bio}>{profile.bio}</p>
+              <h3 className={styles.postsTitle}>Posts</h3>
+              {profile.posts && profile.posts.length > 0 ? (
+                <ul className={styles.postsList}>
+                  {profile.posts.map((post) => (
+                    <li key={post.id} className={styles.postItem}>
+                      {post.title} - ${post.price}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No posts available.</p>
+              )}
             </div>
           </div>
         </div>
       </main>
-    </Layout>
+    </div>
   );
 }
 

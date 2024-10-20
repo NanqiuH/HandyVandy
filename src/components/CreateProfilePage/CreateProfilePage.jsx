@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";  // Import useNavigate from React Router
 import styles from "./CreateProfilePage.module.css";
-import Layout from "../Layout/Layout"
+import Header from "../Layout/Header"
 import { db } from "../../firebase";
 import { auth } from "../../firebase";
 import { storage } from "../../firebase";
@@ -67,8 +67,9 @@ function CreateProfilePage() {
   };
 
   return (
-    <Layout>
-      `<main className={styles.profileCreatePage}>
+    <div>
+    <Header />
+      <main className={styles.profileCreatePage}>
         <div className={styles.container}>
           <div className={styles.content}>
             <section className={styles.formSection}>
@@ -156,8 +157,8 @@ function CreateProfilePage() {
             </section>
           </div>
         </div>
-      </main>`
-    </Layout>
+      </main>
+    </div>
   );
 }
 
