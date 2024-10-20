@@ -6,10 +6,10 @@ import LoginPage from './components/LoginPage/LoginPage';
 import CreateProfilePage from './components/CreateProfilePage/CreateProfilePage';
 import ProfileListPage from './components/ProfileListPage/ProfileListPage';
 import ProfileViewPage from './components/ProfileViewPage/ProfileViewPage';
-import PostPage from './components/CreatePostPage/PostPage';
 import CreatePostingPage from './components/CreatePostingPage/CreatePostingPage';
 import ViewPostingsPage from './components/ViewPostingsPage/ViewPostingsPage';
 import SearchPostingsPage from './components/SearchPostingsPage/SearchPostingsPage';
+import CategoryPage from './components/CategoryPage/CategoryPage';
 
 function App() {
   return (
@@ -21,10 +21,10 @@ function App() {
         <Route path='/create-profile' element={<CreateProfilePage />} />
         <Route path='/profile-list' element={<ProfileListPage />} />
         <Route path="/profile/:id" element={<ProfileViewPage />} />
-        <Route path="/posts" element={<PostPage />} />
         <Route path='/create-posting' element={<CreatePostingPage />} />
         <Route path='/posting-list' element={<ViewPostingsPage />} />
         <Route path='/search-posting' element={<SearchPostingsPage />} />
+        <Route path='/category' element={<CategoryPage />} />
       </Routes>
     </BrowserRouter>
   );
