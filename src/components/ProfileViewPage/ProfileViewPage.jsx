@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import styles from "./ProfileViewPage.module.css";
 import profiles from "../../dummy-data/dummy-data";
-import Layout from "../Layout/Layout";
+import Header from "../Layout/Header";
 
 function ProfileViewPage() {
   const { id } = useParams();
@@ -13,7 +13,8 @@ function ProfileViewPage() {
   }
 
   return (
-    <Layout>
+    <div>
+    <Header />
       <main className={styles.profileDetailPage}>
         <div className={styles.container}>
           <header className={styles.header}>
@@ -48,7 +49,7 @@ function ProfileViewPage() {
           </div>
         </div>
       </main>
-    </Layout>
+    </div>
   );
 }
 
