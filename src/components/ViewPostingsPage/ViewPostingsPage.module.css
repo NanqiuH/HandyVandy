@@ -60,6 +60,11 @@
   flex-direction: column;
 }
 
+.postingLink {
+  text-decoration: none; /* Ensure no underline for links */
+  color: inherit; /* Inherit the text color */
+}
+
 .postingName {
   font-size: 1.2rem;
   font-weight: bold;
