@@ -1,12 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 import styles from "./ProfileViewPage.module.css";
-import profiles from "../../dummy-data/dummy-data";
 import Layout from "../Layout/Layout";
 
 function ProfileViewPage() {
   const { id } = useParams();
-  const profile = profiles.find((p) => p.id === parseInt(id));
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const docRef = doc(db, "profiles", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setProfile(docSnap.data());
+        } else {
+          console.log("No such document!");
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [id]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   if (!profile) {
     return <p>Profile not found.</p>;
@@ -34,16 +62,8 @@ function ProfileViewPage() {
               </div>
             </div>
             <div className={styles.profileDetails}>
-              <h2 className={styles.bioTitle}>Bio</h2>
-              <p className={styles.bio}>{profile.bio}</p>
-              <h3 className={styles.postsTitle}>Posts</h3>
-              <ul className={styles.postsList}>
-                {profile.posts.map((post) => (
-                  <li key={post.id} className={styles.postItem}>
-                    {post.title} - ${post.price}
-                  </li>
-                ))}
-              </ul>
+              <p>{profile.bio}</p>
+              {/* Add more profile details here as needed */}
             </div>
           </div>
         </div>

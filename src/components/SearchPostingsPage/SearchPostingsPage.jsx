@@ -65,7 +65,7 @@ function SearchPostingsPage() {
     setIsLoading(true);
     const fuse = new Fuse(postings, {
       keys: ["postingName", "description"],
-      threshold: 0.3, // Adjust the threshold for fuzzy matching
+      threshold: 0.3,
     });
     let result = fuse.search(keyword).map(({ item }) => item);
 

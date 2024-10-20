@@ -1,10 +1,37 @@
-import React from "react";
-import { Link } from "react-router-dom";  // Import Link for navigation
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 import styles from "./ProfileListPage.module.css";
-import profiles from "../../dummy-data/dummy-data.jsx"
 import Layout from "../Layout/Layout.jsx";
 
 function ProfileListPage() {
+  const [profiles, setProfiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "profiles"));
+        const profilesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setProfiles(profilesData);
+      } catch (error) {
+        console.error("Error fetching profiles: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfiles();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <Layout>
       <main className={styles.profileListPage}>
@@ -15,7 +42,7 @@ function ProfileListPage() {
           <div className={styles.profileList}>
             {profiles.map((profile) => (
               <Link
-                to={`/profile/${profile.id}`}  // Link to profile detail page
+                to={`/profile/${profile.id}`}
                 key={profile.id}
                 className={styles.profileLink}
               >
