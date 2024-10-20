@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";  // Import useNavigate from Reac
 import styles from "./CreatePostingPage.module.css";
 import Layout from "../Layout/Layout";
 import { db } from "../../firebase";
+import { auth } from "../../firebase";
+import { storage } from "../../firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function CreatePostingPage() {
   const [formData, setFormData] = useState({
@@ -39,8 +43,33 @@ function CreatePostingPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    navigate("/");
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      let postingImageUrl = null;
+      if (formData.postingImage) {
+        const storageRef = ref(storage, `postingImages/${formData.postingImage.name}`);
+        await uploadBytes(storageRef, formData.postingImage);
+        postingImageUrl = await getDownloadURL(storageRef);
+      }
+
+      await addDoc(collection(db, "users", user.uid, "postings"), {
+        postingName: formData.postingName,
+        description: formData.description,
+        price: formData.price,
+        postingImageUrl: postingImageUrl,
+        serviceType: formData.serviceType,
+      });
+
+      alert("Posting created successfully");
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   };
 
   return (

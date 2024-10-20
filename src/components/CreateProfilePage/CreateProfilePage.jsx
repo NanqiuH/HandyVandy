@@ -5,7 +5,7 @@ import Layout from "../Layout/Layout"
 import { db } from "../../firebase";
 import { auth } from "../../firebase";
 import { storage } from "../../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function CreateProfilePage() {
@@ -35,8 +35,6 @@ function CreateProfilePage() {
   };
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
-    // console.log(formData);
     e.preventDefault();
     try {
       const user = auth.currentUser;
@@ -51,7 +49,8 @@ function CreateProfilePage() {
         profileImageUrl = await getDownloadURL(storageRef);
       }
 
-      await setDoc(doc(db, "profiles", user.uid), {
+      const profileDocRef = doc(collection(db, "users", user.uid, "profiles"));
+      await setDoc(profileDocRef, {
         firstName: formData.firstName,
         middleName: formData.middleName,
         lastName: formData.lastName,
