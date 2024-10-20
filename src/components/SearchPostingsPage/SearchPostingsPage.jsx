@@ -4,7 +4,7 @@ import { db } from "../../firebase";
 import { auth } from "../../firebase";
 import Fuse from "fuse.js";
 import styles from "./SearchPostingsPage.module.css";
-import Layout from "../Layout/Layout";
+import Header from "../Layout/Header";
 
 const PAGE_SIZE = 10;
 
@@ -97,7 +97,8 @@ function SearchPostingsPage() {
   const paginatedResults = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
-    <Layout>
+    <div>
+    <Header />
       <main className={styles.searchPage}>
         <div className={styles.container}>
           <div className={styles.content}>
@@ -195,7 +196,7 @@ function SearchPostingsPage() {
           </div>
         </div>
       </main>
-    </Layout>
+    </div>
   );
 }
 
