@@ -5,6 +5,7 @@ function PostPage() {
   return (
     <div>
       <Header />
+      <h1>Post Page</h1>
     </div>
   );
 }
