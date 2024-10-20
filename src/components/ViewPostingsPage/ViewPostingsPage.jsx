@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore"; // Import Firestore functions
 import { db } from "../../firebase"; // Firebase config
-import Layout from "../Layout/Layout"; // Import Layout
+import Header from "../Layout/Header"; // Import Header
 import styles from "./ViewPostingsPage.module.css"; // Custom CSS
 
 function ViewPostingsPage() {
@@ -27,7 +27,8 @@ function ViewPostingsPage() {
   }, []);
 
   return (
-    <Layout>
+    <div>
+    <Header />
       <main className={styles.postingsPage}>
         <div className={styles.container}>
           <header className={styles.header}>
@@ -64,7 +65,7 @@ function ViewPostingsPage() {
           </div>
         </div>
       </main>
-    </Layout>
+    </div>
   );
 }
 
