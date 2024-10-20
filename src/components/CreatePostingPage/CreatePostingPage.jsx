@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";  // Import useNavigate from React Router
 import styles from "./CreatePostingPage.module.css";
-import Layout from "../Layout/Layout";
+import Header from "../Layout/Header";
 import { db } from "../../firebase";
 import { auth } from "../../firebase";
 import { storage } from "../../firebase";
@@ -74,7 +74,8 @@ function CreatePostingPage() {
   };
 
   return (
-    <Layout>
+    <div>
+    <Header />
       <main className={styles.postingCreatePage}>
         <div className={styles.container}>
           <div className={styles.content}>
@@ -166,7 +167,7 @@ function CreatePostingPage() {
           </div>
         </div>
       </main>
-    </Layout>
+    </div>
   );
 }
 
