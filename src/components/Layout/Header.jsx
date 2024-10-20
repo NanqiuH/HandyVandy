@@ -17,6 +17,7 @@ const Header = () => {
         <Button variant="contained" color="inherit" onClick={() => navigate('/login')}>Login</Button>
         <Button variant="contained" color="inherit" onClick={() => navigate('/create-profile')}>Create Profile</Button>
         <Button variant="contained" color="inherit" onClick={() => navigate('/profile-list')}>Profile List</Button>
+        <Button variant="contained" color="inherit" onClick={() => navigate('/create-posting')}>Create Posting</Button>
       </nav>
     </header>
   );
