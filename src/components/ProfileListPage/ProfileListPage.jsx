@@ -2,11 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";  // Import Link for navigation
 import styles from "./ProfileListPage.module.css";
 import profiles from "../../dummy-data/dummy-data.jsx"
-import Layout from "../Layout/Layout.jsx";
+import Header from "../Layout/Header.jsx";
 
 function ProfileListPage() {
   return (
-    <Layout>
+    <div>
+    <Header />
       <main className={styles.profileListPage}>
         <div className={styles.container}>
           <header className={styles.header}>
@@ -39,7 +40,7 @@ function ProfileListPage() {
           </div>
         </div>
       </main>
-    </Layout>
+      </div>
   );
 }
 
