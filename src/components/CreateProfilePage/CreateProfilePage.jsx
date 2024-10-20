@@ -49,7 +49,7 @@ function CreateProfilePage() {
         profileImageUrl = await getDownloadURL(storageRef);
       }
 
-      const profileDocRef = doc(collection(db, "users", user.uid, "profiles"));
+      const profileDocRef = doc(db, "profiles", user.uid);
       await setDoc(profileDocRef, {
         firstName: formData.firstName,
         middleName: formData.middleName,

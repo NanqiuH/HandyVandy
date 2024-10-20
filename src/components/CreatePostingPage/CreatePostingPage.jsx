@@ -56,12 +56,13 @@ function CreatePostingPage() {
         postingImageUrl = await getDownloadURL(storageRef);
       }
 
-      await addDoc(collection(db, "users", user.uid, "postings"), {
+      await addDoc(collection(db, "postings"), {
         postingName: formData.postingName,
         description: formData.description,
         price: formData.price,
         postingImageUrl: postingImageUrl,
         serviceType: formData.serviceType,
+        postingUID: user.uid
       });
 
       alert("Posting created successfully");
