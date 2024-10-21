@@ -2,28 +2,32 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreatePostingPage.module.css";
 import Header from "../Layout/Header";
-import { db, auth, storage } from "../../firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, auth, storage } from "../../firebase"; // Import Firebase Firestore, Auth, and Storage
+import { collection, addDoc } from "firebase/firestore"; // Firestore functions to add documents
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase storage functions to handle image upload
 
 function CreatePostingPage() {
+  // State to manage form data
   const [formData, setFormData] = useState({
     postingName: "",
     description: "",
     price: "",
     postingImage: null,
-    serviceType: "none",
-    category: "none",
+    serviceType: "none", // Default value for Service Type
+    category: "none", // Default value for Category
   });
 
+  // State to manage validation errors
   const [serviceTypeError, setServiceTypeError] = useState(false);
   const [categoryError, setCategoryError] = useState(false);
   const [postingNameError, setPostingNameError] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
   const [priceError, setPriceError] = useState(false);
 
+  // Hook to navigate to a different page after form submission
   const navigate = useNavigate();
 
+  // Function to handle changes to input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -31,37 +35,43 @@ function CreatePostingPage() {
       [name]: value,
     });
 
+    // Reset error state when user starts typing in the fields
     if (name === "postingName") setPostingNameError(false);
     if (name === "description") setDescriptionError(false);
     if (name === "price") setPriceError(false);
   };
 
+  // Function to handle image file upload
   const handleImageChange = (e) => {
     setFormData({
       ...formData,
-      postingImage: e.target.files[0],
+      postingImage: e.target.files[0], // Store the uploaded image file
     });
   };
 
+  // Function to handle service type dropdown change
   const handleServiceTypeChange = (e) => {
     setFormData({
       ...formData,
       serviceType: e.target.value,
     });
-    setServiceTypeError(false);
+    setServiceTypeError(false); // Clear the error state if any
   };
 
+  // Function to handle category dropdown change
   const handleCategoryChange = (e) => {
     setFormData({
       ...formData,
       category: e.target.value,
     });
-    setCategoryError(false);
+    setCategoryError(false); // Clear the error state if any
   };
 
+  // Form submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation checks for empty or invalid fields
     let hasError = false;
     if (formData.serviceType === "none") {
       setServiceTypeError(true);
@@ -84,47 +94,50 @@ function CreatePostingPage() {
       hasError = true;
     }
 
+    // If there are validation errors, don't proceed
     if (hasError) {
-      return; 
+      return;
     }
 
     try {
-      const user = auth.currentUser;
+      const user = auth.currentUser; // Get current authenticated user
       if (!user) {
-        throw new Error("User not authenticated");
+        throw new Error("User not authenticated"); // If not authenticated, throw an error
       }
 
       let postingImageUrl = null;
       if (formData.postingImage) {
+        // If an image is uploaded, save it to Firebase Storage
         const storageRef = ref(storage, `postingImages/${formData.postingImage.name}`);
-        await uploadBytes(storageRef, formData.postingImage);
-        postingImageUrl = await getDownloadURL(storageRef);
+        await uploadBytes(storageRef, formData.postingImage); // Upload the image
+        postingImageUrl = await getDownloadURL(storageRef); // Get the download URL for the image
       }
 
-      const timestamp = new Date().toISOString();
+      const timestamp = new Date().toISOString(); // Create a timestamp for when the posting is created
 
+      // Add the new posting to the "postings" collection in Firestore
       await addDoc(collection(db, "postings"), {
         postingName: formData.postingName,
         description: formData.description,
         price: formData.price,
-        postingImageUrl: postingImageUrl,
+        postingImageUrl: postingImageUrl, // Image URL (if uploaded)
         serviceType: formData.serviceType,
         category: formData.category,
-        postingUID: user.uid,
-        createdAt: timestamp,
+        postingUID: user.uid, // Store the user ID of the poster
+        createdAt: timestamp, // Add timestamp to the document
       });
 
-      alert("Posting created successfully");
+      alert("Posting created successfully"); // Show success message
 
-      navigate("/posting-list");
+      navigate("/posting-list"); // Redirect to the postings list page after success
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error adding document: ", error); // Handle any errors during the form submission
     }
   };
 
   return (
     <div>
-      <Header />
+      <Header /> {/* Display the page header */}
       <main className={styles.postingCreatePage}>
         <div className={styles.container}>
           <div className={styles.content}>
@@ -134,7 +147,7 @@ function CreatePostingPage() {
                   <h1 className={styles.title}>Create a New Posting</h1>
                 </header>
                 <form onSubmit={handleSubmit} className={styles.form}>
-
+                
                 {/* Posting Name Field */}
                 <div className={`${styles.inputGroup} ${postingNameError ? styles.error : ""}`}>
                   <label htmlFor="postingName" className={styles.label}>
@@ -286,6 +299,7 @@ function CreatePostingPage() {
                   />
                 </div>
 
+                {/* Submit Button */}
                 <button type="submit" className={styles.button}>
                   Create Posting
                 </button>
