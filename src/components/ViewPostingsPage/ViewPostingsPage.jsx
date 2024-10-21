@@ -47,7 +47,7 @@ function ViewPostingsPage() {
   };
 
   const filteredPostings = postings.filter((posting) => {
-    const matchesPrice = filters.price ? posting.price <= filters.price : true;
+    const matchesPrice = filters.price ? parseFloat(posting.price) <= parseFloat(filters.price) : true;
     const matchesServiceType = filters.serviceType ? posting.serviceType === filters.serviceType : true;
     const matchesCategory = filters.category !== 'none' ? posting.category === filters.category : true;
     const matchesSearchTerm = posting.postingName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -56,9 +56,9 @@ function ViewPostingsPage() {
 
   const sortedPostings = [...filteredPostings].sort((a, b) => {
     if (filters.sortBy === 'price-low-high') {
-      return a.price - b.price; 
+      return parseFloat(a.price) - parseFloat(b.price); 
     } else if (filters.sortBy === 'price-high-low') {
-      return b.price - a.price;
+      return parseFloat(b.price) - parseFloat(a.price);
     } else if (filters.sortBy === 'alphabetical') {
       return a.postingName.localeCompare(b.postingName);
     } else if (filters.sortBy === 'date') {
@@ -136,33 +136,33 @@ function ViewPostingsPage() {
                 const postingImageUrl = posting.postingImageUrl || HandyVandyLogo;
                 console.log(postingImageUrl);
                 return (
-                <Link
-                  to={`/posting/${posting.id}`} 
-                  key={posting.id} 
-                  className={styles.postingLink}
-                >
-                  <div className={styles.postingCard}>
+                  <Link
+                    to={`/posting/${posting.id}`} 
+                    key={posting.id} 
+                    className={styles.postingLink}
+                  >
+                    <div className={styles.postingCard}>
                       <img
                         src={postingImageUrl}
                         alt={posting.postingName}
                         className={styles.postingImage}
                       />
-                    <div className={styles.postingCardContent}>
-                      <h2 className={styles.postingName}>{posting.postingName}</h2>
-                      <p className={styles.postingDescription}>
-                        {posting.description}
-                      </p>
-                      <p className={styles.postingPrice}>Price: ${posting.price}</p>
-                      <p className={styles.postingType}>
-                        {posting.serviceType === "offering"
-                          ? "Offering"
-                          : "Requesting"}
-                      </p>
+                      <div className={styles.postingCardContent}>
+                        <h2 className={styles.postingName}>{posting.postingName}</h2>
+                        <p className={styles.postingDescription}>
+                          {posting.description}
+                        </p>
+                        <p className={styles.postingPrice}>Price: ${posting.price}</p>
+                        <p className={styles.postingType}>
+                          {posting.serviceType === "offering"
+                            ? "Offering"
+                            : "Requesting"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })
+                  </Link>
+                );
+              })
             )}
           </div>
         </div>
