@@ -145,6 +145,7 @@ function ViewPostingsPage() {
             ) : (
               sortedPostings.map((posting) => {
                 const postingImageUrl = posting.postingImageUrl || HandyVandyLogo; // Fallback to default logo if no image
+                console.log(postingImageUrl);
                 return (
                   <Link
                     to={`/posting/${posting.id}`} // Link to individual posting page
