@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { collection, query, orderBy, onSnapshot, addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import Header from "../Layout/Header";
 import styles from "./ChatPage.module.css";
 
 function ChatPage() {
@@ -81,25 +82,31 @@ function ChatPage() {
 
   return (
     <div>
-      <h1>Chat with {receiverUsername}</h1>
-      <div className={styles.messagesContainer}>
-        {messages.map((message) => (
-          <div key={message.id} className={`${styles.message} ${message.senderId === "yourSenderId" ? styles.sentMessage : styles.receivedMessage}`}>
-            <strong>{message.username}: </strong>{message.text}
-            <div className={styles.timestamp}>{formatDate(message.timestamp)}</div>
-          </div>
-        ))}
-      </div>
-      <form onSubmit={handleSendMessage} className={styles.messageForm}>
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          className={styles.messageInput}
-        />
-        <button type="submit" className={styles.sendButton}>Send</button>
-      </form>
+      <Header />
+      <main className={styles.chatPageContainer}>
+        <h1>Chat with {receiverUsername}</h1>
+        <div className={styles.messagesContainer}>
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`${styles.message} ${message.senderId === senderId ? styles.sentMessage : styles.receivedMessage}`}
+            >
+              <strong>{message.username}: </strong>{message.text}
+              <div className={styles.timestamp}>{formatDate(message.timestamp)}</div>
+            </div>
+          ))}
+        </div>
+        <form onSubmit={handleSendMessage} className={styles.messageForm}>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className={styles.messageInput}
+          />
+          <button type="submit" className={styles.sendButton}>Send</button>
+        </form>
+      </main>
     </div>
   );
 }
