@@ -26,7 +26,7 @@ function ProfileListPage() {
 
     fetchProfiles();
   }, []); // Empty dependency array to run only on mount
-
+  
   return (
     <div>
       <Header />
@@ -47,7 +47,7 @@ function ProfileListPage() {
                 >
                   <div className={styles.profileCard}>
                     <img
-                      src={profile.profileImage}
+                      src={profile.profileImageUrl}
                       alt={`${profile.firstName} ${profile.lastName}`}
                       className={styles.profileImage}
                     />
