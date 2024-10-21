@@ -23,12 +23,18 @@ function SinglePostingPage() {
         if (docSnap.exists()) {
           const postingData = docSnap.data();
           setPosting(postingData);
+          
+          if (postingData.postingUID) {
+            const userDocRef = doc(db, "profiles", postingData.postingUID);
+            const userDocSnap = await getDoc(userDocRef);
 
-          const userDocRef = doc(db, "users", postingData.postingUID);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            setUser(userDocSnap.data());
+            if (userDocSnap.exists()) {
+              setUser(userDocSnap.data());
+            } else {
+              console.error("User not found for UID:", postingData.postingUID);
+            }
+          } else {
+            console.error("postingUID not found in posting data.");
           }
         } else {
           setError("Posting not found.");
@@ -73,11 +79,11 @@ function SinglePostingPage() {
             <h1 className={styles.title}>{posting.postingName}</h1>
           </header>
           <div className={styles.postingContent}>
-              <img
-                src={postingImageUrl}
-                alt={posting.postingName}
-                className={styles.postingImage}
-              />
+            <img
+              src={postingImageUrl}
+              alt={posting.postingName}
+              className={styles.postingImage}
+            />
             <div className={styles.postingDetails}>
               <p className={styles.postingDescription}>{posting.description}</p>
               <p className={styles.postingPrice}>Price: ${posting.price}</p>
@@ -88,13 +94,13 @@ function SinglePostingPage() {
                 Posted on: {new Date(posting.createdAt).toLocaleString()}
               </p>
               <p className={styles.postingUser}>
-                Posted by: {user ? user.name || user.username : "Anonymous"}
+                Posted by: {user ? `${user.firstName} ${user.lastName}` : "User not found"}
               </p>
               <button className={styles.purchaseButton} onClick={handlePurchase}>
                 Purchase
               </button>
               <button className={styles.messageButton} onClick={handleMessage}>
-                Message {user ? user.name || user.username : "the seller"}
+                Message {user ? `${user.firstName} ${user.lastName}` : "the seller"}
               </button>
             </div>
           </div>
