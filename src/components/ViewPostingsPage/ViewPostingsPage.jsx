@@ -4,6 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase"; 
 import Header from "../Layout/Header"; 
 import styles from "./ViewPostingsPage.module.css"; 
+import HandyVandyLogo from "../../images/HandyVandyV.png";
 
 function ViewPostingsPage() {
   const [postings, setPostings] = useState([]);
@@ -152,20 +153,21 @@ function ViewPostingsPage() {
             {sortedPostings.length === 0 ? (
               <p>No postings available.</p>
             ) : (
-              sortedPostings.map((posting) => (
+              sortedPostings.map((posting) => {
+                const postingImageUrl = posting.postingImageUrl || HandyVandyLogo;
+                console.log(postingImageUrl);
+                return (
                 <Link
                   to={`/posting/${posting.id}`} 
                   key={posting.id} 
                   className={styles.postingLink}
                 >
                   <div className={styles.postingCard}>
-                    {posting.postingImageUrl && (
                       <img
-                        src={posting.postingImageUrl}
+                        src={postingImageUrl}
                         alt={posting.postingName}
                         className={styles.postingImage}
                       />
-                    )}
                     <div className={styles.postingCardContent}>
                       <h2 className={styles.postingName}>{posting.postingName}</h2>
                       <p className={styles.postingDescription}>
@@ -180,7 +182,8 @@ function ViewPostingsPage() {
                     </div>
                   </div>
                 </Link>
-              ))
+              );
+            })
             )}
           </div>
         </div>

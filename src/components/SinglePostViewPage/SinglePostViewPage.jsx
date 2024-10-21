@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import Header from "../Layout/Header";
 import styles from "./SinglePostViewPage.module.css";
+import HandyVandyLogo from "../../images/HandyVandyV.png";
 
 function SinglePostingPage() {
   const { id } = useParams();
@@ -61,6 +62,8 @@ function SinglePostingPage() {
     return <p>{error}</p>;
   }
 
+  const postingImageUrl = posting.postingImageUrl || HandyVandyLogo;
+
   return (
     <div>
       <Header />
@@ -70,13 +73,11 @@ function SinglePostingPage() {
             <h1 className={styles.title}>{posting.postingName}</h1>
           </header>
           <div className={styles.postingContent}>
-            {posting.postingImageUrl && (
               <img
-                src={posting.postingImageUrl}
+                src={postingImageUrl}
                 alt={posting.postingName}
                 className={styles.postingImage}
               />
-            )}
             <div className={styles.postingDetails}>
               <p className={styles.postingDescription}>{posting.description}</p>
               <p className={styles.postingPrice}>Price: ${posting.price}</p>

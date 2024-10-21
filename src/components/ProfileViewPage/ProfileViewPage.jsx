@@ -4,6 +4,8 @@ import { doc, getDoc } from "firebase/firestore"; // Firestore methods
 import { db } from "../../firebase"; // Firebase config
 import styles from "./ProfileViewPage.module.css";
 import Header from "../Layout/Header";
+import anonProfile from "../../images/anon_profile.png";
+
 
 function ProfileViewPage() {
   const { id } = useParams(); // Get the profile ID from the URL
@@ -47,6 +49,8 @@ function ProfileViewPage() {
     return <p>{error}</p>;
   }
 
+  const profileImageUrl = profile.profileImageUrl || anonProfile;
+
   return (
     <div>
       <Header />
@@ -60,7 +64,7 @@ function ProfileViewPage() {
           <div className={styles.profileContent}>
             <div className={styles.profileSidebar}>
               <img
-                src={profile.profileImage}
+                src={profileImageUrl}
                 alt={`${profile.firstName} ${profile.lastName}`}
                 className={styles.profileImage}
               />

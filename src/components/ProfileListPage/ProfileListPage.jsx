@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";  // Import Link for navigation
+import { Link } from "react-router-dom";
 import styles from "./ProfileListPage.module.css";
-import { collection, getDocs } from "firebase/firestore"; // Firestore methods
-import { db } from "../../firebase"; // Import Firebase config
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 import Header from "../Layout/Header.jsx";
+import anonProfile from "../../images/anon_profile.png";
 
 function ProfileListPage() {
-  const [profiles, setProfiles] = useState([]); // State to hold profiles
+  const [profiles, setProfiles] = useState([]);
 
-  // Fetch profiles from Firestore when the component mounts
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const profilesCollection = collection(db, "profiles"); // Adjust collection name
+        const profilesCollection = collection(db, "profiles");
         const profilesSnapshot = await getDocs(profilesCollection);
         const profilesList = profilesSnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -25,8 +25,8 @@ function ProfileListPage() {
     };
 
     fetchProfiles();
-  }, []); // Empty dependency array to run only on mount
-  
+  }, []);
+
   return (
     <div>
       <Header />
@@ -39,29 +39,32 @@ function ProfileListPage() {
             {profiles.length === 0 ? (
               <p>No profiles available.</p>
             ) : (
-              profiles.map((profile) => (
-                <Link
-                  to={`/profile/${profile.id}`}  // Link to profile detail page
-                  key={profile.id}
-                  className={styles.profileLink}
-                >
-                  <div className={styles.profileCard}>
-                    <img
-                      src={profile.profileImageUrl}
-                      alt={`${profile.firstName} ${profile.lastName}`}
-                      className={styles.profileImage}
-                    />
-                    <div className={styles.profileCardContent}>
-                      <div className={styles.profileDetails}>
-                        <h2 className={styles.profileName}>
-                          {profile.firstName} {profile.middleName} {profile.lastName}
-                        </h2>
-                        <p className={styles.profileBio}>{profile.bio}</p>
+              profiles.map((profile) => {
+                const profileImageUrl = profile.profileImageUrl || anonProfile;
+                return (
+                  <Link
+                    to={`/profile/${profile.id}`}
+                    key={profile.id}
+                    className={styles.profileLink}
+                  >
+                    <div className={styles.profileCard}>
+                      <img
+                        src={profileImageUrl}
+                        alt={`${profile.firstName} ${profile.lastName}`}
+                        className={styles.profileImage}
+                      />
+                      <div className={styles.profileCardContent}>
+                        <div className={styles.profileDetails}>
+                          <h2 className={styles.profileName}>
+                            {profile.firstName} {profile.middleName} {profile.lastName}
+                          </h2>
+                          <p className={styles.profileBio}>{profile.bio}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))
+                  </Link>
+                );
+              })
             )}
           </div>
         </div>

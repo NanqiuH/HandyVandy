@@ -35,9 +35,9 @@
 }
 
 .postingImage {
-  width: 100%;
+  width: 50%;
   height: auto;
-  max-width: 600px;
+  max-width: 200px;
   border-radius: 10px;
   margin-bottom: 20px;
 }
