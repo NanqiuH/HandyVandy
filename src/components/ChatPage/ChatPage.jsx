@@ -24,8 +24,6 @@ function ChatPage() {
         if (userDocSnap.exists()) {
           const { firstName, lastName } = userDocSnap.data();
           setReceiverFullName(`${firstName} ${lastName}`);
-        } else {
-          console.error("User not found for ID:", receiverId);
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -46,8 +44,6 @@ function ChatPage() {
       await sendMessage(newMessage, senderId, receiverId);
       setNewMessage('');
       await saveMessagingDeviceToken(senderId);
-    } else {
-      console.error("User not authenticated");
     }
   };
 
