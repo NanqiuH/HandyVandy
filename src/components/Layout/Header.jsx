@@ -7,7 +7,7 @@ import HandyVandyLogo from './HandyVandyLogoNoBkgd.png';
 
 const Header = () => {
   const navigate = useNavigate(); 
-  const { user, logout } = useAuth();
+  const { user, profileImage, logout } = useAuth();
 
   return (
     <header className={styles.header}>
@@ -20,7 +20,12 @@ const Header = () => {
           <Button variant="contained" color="inherit" onClick={() => navigate('/create-posting')}>Create Posting</Button>
           <Button variant="contained" color="inherit" onClick={() => navigate('/posting-list')}>View Postings</Button>
           <Button variant="contained" color="inherit" onClick={() => { logout(); navigate('/'); }}>Sign Out</Button>
-          {/* <Button variant="contained" color="inherit" onClick={() => navigate('/search-posting')}>Search Posting</Button> */}
+          <img
+            src={profileImage}
+            alt="Profile"
+            className={styles.profilePic}
+            onClick={() => navigate(`/profile/${user.uid}`)}
+          />
         </nav>
       ) : (
         <nav className={styles.nav}>
