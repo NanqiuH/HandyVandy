@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; 
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import Header from "../Layout/Header";
@@ -7,6 +7,7 @@ import styles from "./SinglePostViewPage.module.css";
 
 function SinglePostingPage() {
   const { id } = useParams();
+  const navigate = useNavigate(); 
   const [posting, setPosting] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,12 @@ function SinglePostingPage() {
 
   const handlePurchase = () => {
     alert(`You have purchased: ${posting.postingName}`);
+  };
+
+  const handleMessage = () => {
+    if (posting && posting.postingUID) {
+      navigate(`/chat/${posting.postingUID}`); 
+    }
   };
 
   if (loading) {
@@ -84,6 +91,9 @@ function SinglePostingPage() {
               </p>
               <button className={styles.purchaseButton} onClick={handlePurchase}>
                 Purchase
+              </button>
+              <button className={styles.messageButton} onClick={handleMessage}>
+                Message {user ? user.name || user.username : "the seller"}
               </button>
             </div>
           </div>

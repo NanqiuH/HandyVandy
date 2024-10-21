@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
 import { doc, getDoc } from "firebase/firestore"; // Firestore methods
 import { db } from "../../firebase"; // Firebase config
 import styles from "./ProfileViewPage.module.css";
@@ -7,6 +7,7 @@ import Header from "../Layout/Header";
 
 function ProfileViewPage() {
   const { id } = useParams(); // Get the profile ID from the URL
+  const navigate = useNavigate(); // Initialize navigate
   const [profile, setProfile] = useState(null); // State to hold the profile data
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
@@ -32,6 +33,11 @@ function ProfileViewPage() {
 
     fetchProfile();
   }, [id]); // Fetch the profile whenever the ID changes
+
+  const handleSendMessage = () => {
+    // Navigate to the chat page for the user
+    navigate(`/chat/${id}`);
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -62,6 +68,12 @@ function ProfileViewPage() {
                 <div className={styles.rating}>{"⭐️⭐️⭐️⭐️⭐️"}</div>
                 <button className={styles.friendButton}>
                   Send Friend Request
+                </button>
+                <button 
+                  className={styles.messageButton} 
+                  onClick={handleSendMessage}
+                >
+                  Send Message
                 </button>
               </div>
             </div>

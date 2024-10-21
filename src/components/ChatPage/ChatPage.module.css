@@ -1,0 +1,36 @@
+.messagesContainer {
+    height: 400px; 
+    overflow-y: scroll; 
+    border: 1px solid #ccc; 
+    margin-bottom: 10px; 
+  }
+  
+  .message {
+    padding: 10px;
+    border-bottom: 1px solid #eee; 
+  }
+  
+  .messageForm {
+    display: flex;
+  }
+  
+  .messageInput {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc; 
+    border-radius: 5px;
+  }
+  
+  .sendButton {
+    padding: 10px;
+    background-color: #007bff; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .sendButton:hover {
+    background-color: #0056b3; 
+  }
+  
