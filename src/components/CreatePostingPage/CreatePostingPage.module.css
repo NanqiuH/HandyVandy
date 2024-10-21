@@ -145,3 +145,22 @@
     width: 100%;
   }
   
+  .button {
+    background-color: #007bff; /* Primary color */
+    color: white; /* Text color */
+    padding: 10px 20px; /* Padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s ease; /* Smooth transition */
+  }
+  
+  .button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+  }
+  
+  .button:disabled {
+    background-color: #cccccc; /* Disabled state color */
+    cursor: not-allowed; /* Not-allowed cursor on hover */
+  }
