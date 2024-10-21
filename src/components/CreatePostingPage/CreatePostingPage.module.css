@@ -95,3 +95,53 @@
     cursor: pointer;
   }
   
+  .errorInput {
+    border: 2px solid red;
+  }
+  
+  .errorMessage {
+    color: red;
+    font-size: 0.9em;
+  }
+  
+  .error {
+    margin-bottom: 10px;
+  }
+  
+  .priceInputContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dollarSign {
+    margin-right: 0.5rem;
+    font-size: 1.2rem; 
+  }
+  .row {
+    display: flex;
+    justify-content: space-between; 
+    gap: 1rem;
+  }
+  
+  .inputGroup {
+    flex: 1; 
+  }
+  
+  .priceInputContainer {
+    display: flex;
+    align-items: center; 
+  }
+  
+  .dollarSign {
+    margin-right: 5px; 
+  }
+  
+  .inputGroup {
+    max-width: 880px; 
+  }
+  
+  .textarea,
+  .input {
+    width: 100%;
+  }
+  

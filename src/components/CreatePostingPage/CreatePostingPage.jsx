@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate from React Router
+import { useNavigate } from "react-router-dom";
 import styles from "./CreatePostingPage.module.css";
 import Header from "../Layout/Header";
-import { db } from "../../firebase";
-import { auth } from "../../firebase";
-import { storage } from "../../firebase";
+import { db, auth, storage } from "../../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -14,8 +12,15 @@ function CreatePostingPage() {
     description: "",
     price: "",
     postingImage: null,
-    serviceType: "offering", // Default option for service type
+    serviceType: "none",
+    category: "none",
   });
+
+  const [serviceTypeError, setServiceTypeError] = useState(false);
+  const [categoryError, setCategoryError] = useState(false);
+  const [postingNameError, setPostingNameError] = useState(false);
+  const [descriptionError, setDescriptionError] = useState(false);
+  const [priceError, setPriceError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -25,6 +30,10 @@ function CreatePostingPage() {
       ...formData,
       [name]: value,
     });
+
+    if (name === "postingName") setPostingNameError(false);
+    if (name === "description") setDescriptionError(false);
+    if (name === "price") setPriceError(false);
   };
 
   const handleImageChange = (e) => {
@@ -39,10 +48,46 @@ function CreatePostingPage() {
       ...formData,
       serviceType: e.target.value,
     });
+    setServiceTypeError(false);
+  };
+
+  const handleCategoryChange = (e) => {
+    setFormData({
+      ...formData,
+      category: e.target.value,
+    });
+    setCategoryError(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let hasError = false;
+    if (formData.serviceType === "none") {
+      setServiceTypeError(true);
+      hasError = true;
+    }
+    if (formData.category === "none") {
+      setCategoryError(true);
+      hasError = true;
+    }
+    if (formData.postingName.trim() === "") {
+      setPostingNameError(true);
+      hasError = true;
+    }
+    if (formData.description.trim() === "") {
+      setDescriptionError(true);
+      hasError = true;
+    }
+    if (formData.price.trim() === "") {
+      setPriceError(true);
+      hasError = true;
+    }
+
+    if (hasError) {
+      return; 
+    }
+
     try {
       const user = auth.currentUser;
       if (!user) {
@@ -56,13 +101,17 @@ function CreatePostingPage() {
         postingImageUrl = await getDownloadURL(storageRef);
       }
 
+      const timestamp = new Date().toISOString();
+
       await addDoc(collection(db, "postings"), {
         postingName: formData.postingName,
         description: formData.description,
         price: formData.price,
         postingImageUrl: postingImageUrl,
         serviceType: formData.serviceType,
-        postingUID: user.uid
+        category: formData.category,
+        postingUID: user.uid,
+        createdAt: timestamp,
       });
 
       alert("Posting created successfully");
@@ -75,7 +124,7 @@ function CreatePostingPage() {
 
   return (
     <div>
-    <Header />
+      <Header />
       <main className={styles.postingCreatePage}>
         <div className={styles.container}>
           <div className={styles.content}>
@@ -85,83 +134,163 @@ function CreatePostingPage() {
                   <h1 className={styles.title}>Create a New Posting</h1>
                 </header>
                 <form onSubmit={handleSubmit} className={styles.form}>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="postingName" className={styles.label}>
-                      Posting Name
-                    </label>
-                    <input
-                      type="text"
-                      id="postingName"
-                      name="postingName"
-                      value={formData.postingName}
-                      onChange={handleChange}
-                      className={styles.input}
-                      required
-                    />
-                  </div>
 
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="description" className={styles.label}>
-                      Description
-                    </label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      className={styles.textarea}
-                      required
-                    />
-                  </div>
+                {/* Posting Name Field */}
+                <div className={`${styles.inputGroup} ${postingNameError ? styles.error : ""}`}>
+                  <label htmlFor="postingName" className={styles.label}>
+                    Posting Name
+                  </label>
+                  <input
+                    type="text"
+                    id="postingName"
+                    name="postingName"
+                    value={formData.postingName}
+                    onChange={handleChange}
+                    className={`${styles.input} ${postingNameError ? styles.errorInput : ""}`}
+                    required
+                  />
+                  {postingNameError && (
+                    <span className={styles.errorMessage}>
+                      Please enter a valid posting name.
+                    </span>
+                  )}
+                </div>
 
-                  <div className={styles.inputGroup}>
+                {/* Description Field */}
+                <div className={`${styles.inputGroup} ${descriptionError ? styles.error : ""}`}>
+                  <label htmlFor="description" className={styles.label}>
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className={`${styles.textarea} ${descriptionError ? styles.errorInput : ""}`}
+                    required
+                  />
+                  {descriptionError && (
+                    <span className={styles.errorMessage}>
+                      Please enter a description.
+                    </span>
+                  )}
+                </div>
+
+                {/* Price, Service Type, and Category Fields Side by Side */}
+                <div className={styles.row}>
+                  {/* Price Field */}
+                  <div className={`${styles.inputGroup} ${priceError ? styles.error : ""}`}>
                     <label htmlFor="price" className={styles.label}>
                       Price
                     </label>
-                    <input
-                      type="text"
-                      id="price"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleChange}
-                      className={styles.input}
-                      required
-                    />
+                    <div className={styles.priceInputContainer}>
+                      <span className={styles.dollarSign}>$</span>
+                      <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        className={`${styles.input} ${priceError ? styles.errorInput : ""}`}
+                        required
+                        min="0"
+                        step="any"
+                      />
+                    </div>
+                    {priceError && (
+                      <span className={styles.errorMessage}>
+                        Please enter a valid price.
+                      </span>
+                    )}
                   </div>
 
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="postingImage" className={styles.label}>
-                      Attach Image
-                    </label>
-                    <input
-                      type="file"
-                      id="postingImage"
-                      name="postingImage"
-                      onChange={handleImageChange}
-                      className={styles.inputFile}
-                    />
-                  </div>
-
-                  <div className={styles.inputGroup}>
+                  {/* Service Type Field */}
+                  <div className={`${styles.inputGroup} ${serviceTypeError ? styles.error : ""}`}>
                     <label htmlFor="serviceType" className={styles.label}>
-                      Are you offering or requesting a service?
+                      Service Type
                     </label>
                     <select
                       id="serviceType"
                       name="serviceType"
                       value={formData.serviceType}
                       onChange={handleServiceTypeChange}
-                      className={styles.select}
+                      className={`${styles.select} ${serviceTypeError ? styles.errorInput : ""}`}
                     >
+                      <option value="none">None</option>
                       <option value="offering">Offering</option>
                       <option value="requesting">Requesting</option>
                     </select>
+                    {serviceTypeError && (
+                      <span className={styles.errorMessage}>
+                        Please select a valid service type.
+                      </span>
+                    )}
                   </div>
 
-                  <button type="submit" className={styles.submitButton}>
-                    Create Posting
-                  </button>
-                </form>
+                  {/* Category Field */}
+                  <div className={`${styles.inputGroup} ${categoryError ? styles.error : ""}`}>
+                    <label htmlFor="category" className={styles.label}>
+                      Category
+                    </label>
+                    <select
+                      id="category"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleCategoryChange}
+                      className={`${styles.select} ${categoryError ? styles.errorInput : ""}`}
+                    >
+                      <option value="none">None</option>
+                      <option value="physical labor">Physical Labor</option>
+                      <option value="tutoring">Tutoring</option>
+                      <option value="food">Food</option>
+                      <option value="performance">Performance</option>
+                      <option value="travel">Travel</option>
+                      <option value="technology">Technology</option>
+                      <option value="cleaning">Cleaning</option>
+                      <option value="transportation">Transportation</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="childcare">Childcare</option>
+                      <option value="home improvement">Home Improvement</option>
+                      <option value="pet care">Pet Care</option>
+                      <option value="event planning">Event Planning</option>
+                      <option value="education">Education</option>
+                      <option value="art and design">Art & Design</option>
+                      <option value="fitness">Fitness</option>
+                      <option value="landscaping">Landscaping</option>
+                      <option value="writing">Writing</option>
+                      <option value="music">Music</option>
+                      <option value="photography">Photography</option>
+                      <option value="automotive">Automotive</option>
+                      <option value="other">Other</option>
+                    </select>
+                    {categoryError && (
+                      <span className={styles.errorMessage}>
+                        Please select a valid category.
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Image Upload */}
+                <div className={styles.inputGroup}>
+                  <label htmlFor="postingImage" className={styles.label}>
+                    Upload an Image
+                  </label>
+                  <input
+                    type="file"
+                    id="postingImage"
+                    name="postingImage"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className={styles.input}
+                  />
+                </div>
+
+                <button type="submit" className={styles.button}>
+                  Create Posting
+                </button>
+              </form>
+
               </div>
             </section>
           </div>

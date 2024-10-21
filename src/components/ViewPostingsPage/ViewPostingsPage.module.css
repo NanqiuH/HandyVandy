@@ -9,10 +9,11 @@
 }
 
 .container {
+  position: sticky;
   max-width: 1200px;
   width: 100%;
   padding: 20px;
-  margin-top: -220px; /* Match the margin from ProfileListPage */
+  margin-top: 0px;
 }
 
 .header {
@@ -31,6 +32,7 @@
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  margin-top: 20px;
 }
 
 .postingCard {
@@ -61,8 +63,8 @@
 }
 
 .postingLink {
-  text-decoration: none; /* Ensure no underline for links */
-  color: inherit; /* Inherit the text color */
+  text-decoration: none;
+  color: inherit;
 }
 
 .postingName {
@@ -89,4 +91,59 @@
   font-size: 14px;
   color: #333;
   margin-top: 5px;
+}
+
+.filters {
+  display: flex; 
+  flex-wrap: wrap;
+  gap: 10px; 
+  margin-top: 20px; 
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filters input[type="number"],
+.filters select {
+  padding: 10px; 
+  border: 1px solid #ccc; 
+  border-radius: 0; 
+  font-size: 16px; 
+  width: 50%; 
+  max-width: 50%; 
+  margin-top: 5px; 
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus {
+  border-color: #007bff; 
+  outline: none; 
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); 
+}
+
+.searchBar {
+  padding: 15px 20px; 
+  border: 1px solid #ccc;
+  border-radius: 0; 
+  font-size: 18px; 
+  width: 100%; 
+  max-width: 600px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  transition: border-color 0.3s; 
+}
+
+.searchBar:focus {
+  border-color: #007bff; 
+  outline: none; 
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+  font-weight: bold;
 }
