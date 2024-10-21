@@ -12,7 +12,7 @@ function ViewPostingsPage() {
     price: '',
     serviceType: '',
     category: 'none',
-    sortBy: 'none',
+    sortBy: 'date',
   });
   const [searchTerm, setSearchTerm] = useState(""); 
 
@@ -50,13 +50,15 @@ function ViewPostingsPage() {
     const matchesPrice = filters.price ? posting.price <= filters.price : true;
     const matchesServiceType = filters.serviceType ? posting.serviceType === filters.serviceType : true;
     const matchesCategory = filters.category !== 'none' ? posting.category === filters.category : true;
-    const matchesSearchTerm = posting.postingName.toLowerCase().includes(searchTerm.toLowerCase()); // Search match
+    const matchesSearchTerm = posting.postingName.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesPrice && matchesServiceType && matchesCategory && matchesSearchTerm;
   });
 
   const sortedPostings = [...filteredPostings].sort((a, b) => {
-    if (filters.sortBy === 'price') {
+    if (filters.sortBy === 'price-low-high') {
       return a.price - b.price; 
+    } else if (filters.sortBy === 'price-high-low') {
+      return b.price - a.price;
     } else if (filters.sortBy === 'alphabetical') {
       return a.postingName.localeCompare(b.postingName);
     } else if (filters.sortBy === 'date') {
@@ -71,7 +73,6 @@ function ViewPostingsPage() {
       <main className={styles.postingsPage}>
         <div className={styles.container}>
           <header className={styles.header}>
-        {/* <h1 className={styles.title}>Postings</h1> */}
             <input
               type="text"
               className={styles.searchBar}
@@ -110,29 +111,6 @@ function ViewPostingsPage() {
                   onChange={handleFilterChange}
                 >
                   <option value="none">All</option>
-                  <option value="physical labor">Physical Labor</option>
-                  <option value="tutoring">Tutoring</option>
-                  <option value="food">Food</option>
-                  <option value="performance">Performance</option>
-                  <option value="travel">Travel</option>
-                  <option value="technology">Technology</option>
-                  <option value="cleaning">Cleaning</option>
-                  <option value="transportation">Transportation</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="childcare">Childcare</option>
-                  <option value="home improvement">Home Improvement</option>
-                  <option value="pet care">Pet Care</option>
-                  <option value="event planning">Event Planning</option>
-                  <option value="education">Education</option>
-                  <option value="art and design">Art & Design</option>
-                  <option value="fitness">Fitness</option>
-                  <option value="landscaping">Landscaping</option>
-                  <option value="writing">Writing</option>
-                  <option value="music">Music</option>
-                  <option value="photography">Photography</option>
-                  <option value="automotive">Automotive</option>
-                  <option value="legal">Legal</option>
-                  <option value="other">Other</option>
                 </select>
               </label>
               <label>
@@ -143,7 +121,8 @@ function ViewPostingsPage() {
                   onChange={handleFilterChange}
                 >
                   <option value="date">Upload Date</option>
-                  <option value="price">Price</option>
+                  <option value="price-low-high">Price (low to high)</option>
+                  <option value="price-high-low">Price (high to low)</option>
                   <option value="alphabetical">Alphabetically</option>
                 </select>
               </label>
