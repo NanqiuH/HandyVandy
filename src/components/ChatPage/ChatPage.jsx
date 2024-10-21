@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchMessages, sendMessage, fetchUserName } from '../../messaging'; // Corrected import
-import { saveMessagingDeviceToken } from '../../messaging'; // For FCM token handling
+import { fetchMessages, sendMessage, saveMessagingDeviceToken } from '../../messaging'; 
+import { doc, getDoc } from 'firebase/firestore'; 
+import { db, auth } from '../../firebase'; 
 import Header from '../Layout/Header';
 import styles from './ChatPage.module.css';
 
@@ -9,32 +10,45 @@ function ChatPage() {
   const { id: receiverId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [usernames, setUsernames] = useState({});
-  const [receiverUsername, setReceiverUsername] = useState('');
-  const senderId = 'yourSenderId'; // Placeholder for the current user
+  const [receiverFullName, setReceiverFullName] = useState('');
+
+  const user = auth.currentUser;
+  const senderId = user ? user.uid : null;
 
   useEffect(() => {
-    const fetchReceiverUsername = async () => {
-      const username = await fetchUserName(receiverId, setUsernames, usernames);
-      setReceiverUsername(username);
+    const fetchReceiverFullName = async () => {
+      try {
+        const userDocRef = doc(db, 'profiles', receiverId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const { firstName, lastName } = userDocSnap.data();
+          setReceiverFullName(`${firstName} ${lastName}`);
+        } else {
+          console.error("User not found for ID:", receiverId);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
     };
 
-    fetchReceiverUsername();
-  }, [receiverId, usernames]);
+    fetchReceiverFullName();
+  }, [receiverId]);
 
   useEffect(() => {
-    const unsubscribe = fetchMessages(receiverId, senderId, setMessages, (userId) =>
-      fetchUserName(userId, setUsernames, usernames)
-    );
-
+    const unsubscribe = fetchMessages(receiverId, senderId, setMessages);
     return () => unsubscribe();
-  }, [receiverId, senderId, usernames]);
+  }, [receiverId, senderId]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    await sendMessage(newMessage, senderId, receiverId);
-    setNewMessage('');
-    await saveMessagingDeviceToken(senderId);
+    if (senderId) {
+      await sendMessage(newMessage, senderId, receiverId);
+      setNewMessage('');
+      await saveMessagingDeviceToken(senderId);
+    } else {
+      console.error("User not authenticated");
+    }
   };
 
   const formatDate = (timestamp) => {
@@ -46,16 +60,14 @@ function ChatPage() {
     <div>
       <Header />
       <main className={styles.chatPageContainer}>
-        <h1>Chat with {receiverUsername}</h1>
+        <h1>Chat with {receiverFullName || 'User'}</h1>
         <div className={styles.messagesContainer}>
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`${styles.message} ${
-                message.senderId === senderId ? styles.sentMessage : styles.receivedMessage
-              }`}
+              className={`${styles.message} ${message.senderId === senderId ? styles.sentMessage : styles.receivedMessage}`}
             >
-              <strong>{message.username}: </strong>
+              <strong>{message.senderId === senderId ? "You" : receiverFullName}: </strong>
               {message.text}
               <div className={styles.timestamp}>{formatDate(message.timestamp)}</div>
             </div>
