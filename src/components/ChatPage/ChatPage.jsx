@@ -1,35 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { collection, query, orderBy, onSnapshot, addDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase"; // Firebase config
-import styles from "./ChatPage.module.css"; // Import your CSS module
+import { db } from "../../firebase";
+import styles from "./ChatPage.module.css";
 
 function ChatPage() {
-  const { id } = useParams(); // Get the profile ID from the URL
+  const { id } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [usernames, setUsernames] = useState({}); // Store usernames by their IDs
-  const [receiverUsername, setReceiverUsername] = useState(""); // Store the receiver's username
+  const [usernames, setUsernames] = useState({});
+  const [receiverUsername, setReceiverUsername] = useState("");
+  const senderId = "yourSenderId";
 
-  // Fetch usernames based on senderId
   const fetchUsername = async (userId) => {
-    if (!userId) return "Unknown"; // Fallback in case userId is not found
-    if (usernames[userId]) return usernames[userId]; // Return cached username if already fetched
+    if (!userId) return "Unknown";
+    if (usernames[userId]) return usernames[userId];
 
-    const userDoc = await getDoc(doc(db, "users", userId)); // Assuming you have a "users" collection
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
       const username = userDoc.data().username;
-      setUsernames((prev) => ({ ...prev, [userId]: username })); // Cache the fetched username
+      setUsernames((prev) => ({ ...prev, [userId]: username }));
       return username;
     } else {
-      return "User"; // Handle case where user doesn't exist
+      return "User";
     }
   };
 
-  // Fetch the receiver's username when the component loads
   useEffect(() => {
     const fetchReceiverUsername = async () => {
-      const username = await fetchUsername(id); // Fetch the username of the receiver based on the `id`
+      const username = await fetchUsername(id);
       setReceiverUsername(username);
     };
 
@@ -39,59 +38,55 @@ function ChatPage() {
   useEffect(() => {
     const fetchMessages = async () => {
       const messagesRef = collection(db, "messages");
-
-      // Order by timestamp so that the messages appear in the correct order
-      const q = query(messagesRef, orderBy("timestamp", "asc")); // Ordering by timestamp in ascending order
+      const q = query(messagesRef, orderBy("timestamp", "asc"));
 
       const unsubscribe = onSnapshot(q, async (snapshot) => {
         const messagesData = await Promise.all(
           snapshot.docs.map(async (doc) => {
             const messageData = doc.data();
-            const username = await fetchUsername(messageData.senderId); // Fetch the sender's username
+            const username = await fetchUsername(messageData.senderId);
             return {
               id: doc.id,
               ...messageData,
-              username, // Add the username to the message object
+              username,
             };
           })
         );
         setMessages(messagesData);
       });
 
-      return () => unsubscribe(); // Cleanup on unmount
+      return () => unsubscribe();
     };
 
     fetchMessages();
   }, [id]);
 
-  // Function to handle sending a new message
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (newMessage.trim() !== "") {
       await addDoc(collection(db, "messages"), {
         text: newMessage,
-        senderId: "yourSenderId", // Replace with your actual sender ID
-        receiverId: id, // The ID of the user you're messaging
-        timestamp: new Date(), // Timestamp for ordering
+        senderId: senderId,
+        receiverId: id,
+        timestamp: new Date(),
       });
-      setNewMessage(""); // Clear the input field
+      setNewMessage("");
     }
   };
 
-  // Helper function to format timestamp
   const formatDate = (timestamp) => {
-    const date = new Date(timestamp.seconds * 1000); // Firestore returns timestamp as seconds
-    return date.toLocaleString(); // Format the date and time as a readable string
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleString();
   };
 
   return (
     <div>
-      <h1>Chat with {receiverUsername}</h1> {/* Display receiver's username */}
+      <h1>Chat with {receiverUsername}</h1>
       <div className={styles.messagesContainer}>
         {messages.map((message) => (
-          <div key={message.id} className={styles.message}>
+          <div key={message.id} className={`${styles.message} ${message.senderId === "yourSenderId" ? styles.sentMessage : styles.receivedMessage}`}>
             <strong>{message.username}: </strong>{message.text}
-            <div className={styles.timestamp}>{formatDate(message.timestamp)}</div> {/* Display timestamp */}
+            <div className={styles.timestamp}>{formatDate(message.timestamp)}</div>
           </div>
         ))}
       </div>

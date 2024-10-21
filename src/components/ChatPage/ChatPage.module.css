@@ -1,36 +1,98 @@
 .messagesContainer {
-    height: 400px; 
-    overflow-y: scroll; 
-    border: 1px solid #ccc; 
-    margin-bottom: 10px; 
-  }
-  
-  .message {
-    padding: 10px;
-    border-bottom: 1px solid #eee; 
-  }
-  
-  .messageForm {
-    display: flex;
-  }
-  
-  .messageInput {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc; 
-    border-radius: 5px;
-  }
-  
-  .sendButton {
-    padding: 10px;
-    background-color: #007bff; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .sendButton:hover {
-    background-color: #0056b3; 
-  }
-  
+  height: 400px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  padding: 10px; /* Add padding for some spacing */
+}
+
+.messageSent {
+  background-color: #daf8e3; /* Light green for sent messages */
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 15px;
+  max-width: 60%;
+  align-self: flex-end; /* Align to the right */
+  text-align: right; /* Text alignment to the right */
+  margin-left: auto; /* Push the message to the right */
+  border-bottom-right-radius: 0; /* Bubble style */
+}
+
+.messageReceived {
+  background-color: #f1f0f0; /* Light grey for received messages */
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 15px;
+  max-width: 60%;
+  align-self: flex-start; /* Align to the left */
+  text-align: left; /* Text alignment to the left */
+  margin-right: auto; /* Push the message to the left */
+  border-bottom-left-radius: 0; /* Bubble style */
+}
+
+.messageForm {
+  display: flex;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.sendButton {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sendButton:hover {
+  background-color: #0056b3;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #bbb !important;
+  margin-top: 5px;
+}
+
+.messagesContainer {
+  height: 400px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.message {
+  max-width: 60%;
+  word-wrap: break-word;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.sentMessage {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+}
+
+.receivedMessage {
+  background-color: #f1f1f1;
+  color: black;
+  align-self: flex-start;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #777;
+  margin-top: 5px;
+}
