@@ -37,3 +37,11 @@ button:hover {
   color: #000;
   cursor: pointer;
 }
+
+.profilePic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: 10px;
+}
