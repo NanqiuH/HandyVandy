@@ -1,78 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { collection, query, orderBy, onSnapshot, addDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase";
-import Header from "../Layout/Header";
-import styles from "./ChatPage.module.css";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchMessages, sendMessage, fetchUserName } from '../../messaging'; // Corrected import
+import { saveMessagingDeviceToken } from '../../messaging'; // For FCM token handling
+import Header from '../Layout/Header';
+import styles from './ChatPage.module.css';
 
 function ChatPage() {
-  const { id } = useParams();
+  const { id: receiverId } = useParams();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const [usernames, setUsernames] = useState({});
-  const [receiverUsername, setReceiverUsername] = useState("");
-  const senderId = "yourSenderId";
-
-  const fetchUsername = async (userId) => {
-    if (!userId) return "Unknown";
-    if (usernames[userId]) return usernames[userId];
-
-    const userDoc = await getDoc(doc(db, "users", userId));
-    if (userDoc.exists()) {
-      const username = userDoc.data().username;
-      setUsernames((prev) => ({ ...prev, [userId]: username }));
-      return username;
-    } else {
-      return "User";
-    }
-  };
+  const [receiverUsername, setReceiverUsername] = useState('');
+  const senderId = 'yourSenderId'; // Placeholder for the current user
 
   useEffect(() => {
     const fetchReceiverUsername = async () => {
-      const username = await fetchUsername(id);
+      const username = await fetchUserName(receiverId, setUsernames, usernames);
       setReceiverUsername(username);
     };
 
     fetchReceiverUsername();
-  }, [id]);
+  }, [receiverId, usernames]);
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      const messagesRef = collection(db, "messages");
-      const q = query(messagesRef, orderBy("timestamp", "asc"));
+    const unsubscribe = fetchMessages(receiverId, senderId, setMessages, (userId) =>
+      fetchUserName(userId, setUsernames, usernames)
+    );
 
-      const unsubscribe = onSnapshot(q, async (snapshot) => {
-        const messagesData = await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const messageData = doc.data();
-            const username = await fetchUsername(messageData.senderId);
-            return {
-              id: doc.id,
-              ...messageData,
-              username,
-            };
-          })
-        );
-        setMessages(messagesData);
-      });
-
-      return () => unsubscribe();
-    };
-
-    fetchMessages();
-  }, [id]);
+    return () => unsubscribe();
+  }, [receiverId, senderId, usernames]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (newMessage.trim() !== "") {
-      await addDoc(collection(db, "messages"), {
-        text: newMessage,
-        senderId: senderId,
-        receiverId: id,
-        timestamp: new Date(),
-      });
-      setNewMessage("");
-    }
+    await sendMessage(newMessage, senderId, receiverId);
+    setNewMessage('');
+    await saveMessagingDeviceToken(senderId);
   };
 
   const formatDate = (timestamp) => {
@@ -89,9 +51,12 @@ function ChatPage() {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`${styles.message} ${message.senderId === senderId ? styles.sentMessage : styles.receivedMessage}`}
+              className={`${styles.message} ${
+                message.senderId === senderId ? styles.sentMessage : styles.receivedMessage
+              }`}
             >
-              <strong>{message.username}: </strong>{message.text}
+              <strong>{message.username}: </strong>
+              {message.text}
               <div className={styles.timestamp}>{formatDate(message.timestamp)}</div>
             </div>
           ))}
