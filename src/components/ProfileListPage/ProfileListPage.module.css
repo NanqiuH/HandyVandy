@@ -16,7 +16,7 @@
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 .title {
@@ -24,6 +24,7 @@
   font-weight: 600;
   text-align: center;
   color: #333;
+  margin-top: 200px;
 }
 
 .profileList {
@@ -50,7 +51,7 @@
 .profileImage {
   width: 250px;
   height: 250px;
-  border-radius: 00%;
+  border-radius: 0%;
   object-fit: cover;
   margin-bottom: 15px;
 }
@@ -74,4 +75,23 @@
 .profileLink {
   text-decoration: none;
   color: inherit;
+}
+
+
+.searchBar {
+  padding: 15px 20px; 
+  border: 1px solid #ccc;
+  border-radius: 0; 
+  font-size: 18px; 
+  width: 100%; 
+  max-width: 600px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  transition: border-color 0.3s; 
+  margin-top: 10px; 
+  margin-bottom: 30px;
+}
+
+.searchBar:focus {
+  border-color: #007bff; 
+  outline: none; 
 }

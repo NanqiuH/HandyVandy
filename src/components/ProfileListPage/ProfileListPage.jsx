@@ -8,7 +8,8 @@ import anonProfile from "../../images/anon_profile.png";
 
 function ProfileListPage() {
   const [profiles, setProfiles] = useState([]);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
@@ -27,6 +28,17 @@ function ProfileListPage() {
     fetchProfiles();
   }, []);
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredProfiles = profiles.filter((profile) => {
+    const fullName = `${profile.firstName} ${profile.middleName || ""} ${profile.lastName}`
+      .toLowerCase()
+      .trim();
+    return fullName.includes(searchTerm.toLowerCase());
+  });
+
   return (
     <div>
       <Header />
@@ -35,11 +47,18 @@ function ProfileListPage() {
           <header className={styles.header}>
             <h1 className={styles.title}>Profiles</h1>
           </header>
+          <input
+            type="text"
+            placeholder="Search profiles..."
+            className={styles.searchBar}
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
           <div className={styles.profileList}>
-            {profiles.length === 0 ? (
+            {filteredProfiles.length === 0 ? (
               <p>No profiles available.</p>
             ) : (
-              profiles.map((profile) => {
+              filteredProfiles.map((profile) => {
                 const profileImageUrl = profile.profileImageUrl || anonProfile;
                 return (
                   <Link
