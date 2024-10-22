@@ -145,7 +145,6 @@ function ViewPostingsPage() {
                   <option value="music">Music</option>
                   <option value="photography">Photography</option>
                   <option value="automotive">Automotive</option>
-                  <option value="legal">Legal</option>
                   <option value="other">Other</option>
                 </select>
               </label>
