@@ -45,7 +45,7 @@ function CreatePostingPage() {
   const handleImageChange = (e) => {
     setFormData({
       ...formData,
-      postingImage: e.target.files[0], // Store the uploaded image file
+      postingImage: e.target.files[0],
     });
   };
 
@@ -55,7 +55,7 @@ function CreatePostingPage() {
       ...formData,
       serviceType: e.target.value,
     });
-    setServiceTypeError(false); // Clear the error state if any
+    setServiceTypeError(false);
   };
 
   // Function to handle category dropdown change
@@ -64,7 +64,7 @@ function CreatePostingPage() {
       ...formData,
       category: e.target.value,
     });
-    setCategoryError(false); // Clear the error state if any
+    setCategoryError(false);
   };
 
   // Form submit handler
@@ -96,7 +96,7 @@ function CreatePostingPage() {
 
     // If there are validation errors, don't proceed
     if (hasError) {
-      return;
+      return; 
     }
 
     try {
@@ -137,7 +137,7 @@ function CreatePostingPage() {
 
   return (
     <div>
-      <Header /> {/* Display the page header */}
+      <Header />
       <main className={styles.postingCreatePage}>
         <div className={styles.container}>
           <div className={styles.content}>
@@ -147,7 +147,7 @@ function CreatePostingPage() {
                   <h1 className={styles.title}>Create a New Posting</h1>
                 </header>
                 <form onSubmit={handleSubmit} className={styles.form}>
-                
+
                 {/* Posting Name Field */}
                 <div className={`${styles.inputGroup} ${postingNameError ? styles.error : ""}`}>
                   <label htmlFor="postingName" className={styles.label}>
@@ -299,7 +299,6 @@ function CreatePostingPage() {
                   />
                 </div>
 
-                {/* Submit Button */}
                 <button type="submit" className={styles.button}>
                   Create Posting
                 </button>
