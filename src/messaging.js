@@ -7,19 +7,28 @@ const VAPID_KEY = "BEQFx3BckKgroKNiBuxoGEBUMpzkzols0HkFn7FR_Vst4XF8fhEszkXLJvzYg
 
 export const fetchMessages = (receiverId, senderId, setMessages) => {
   const messagesRef = collection(db, 'messages');
-  const q = query(messagesRef, orderBy('timestamp', 'asc'));
+  const q = query(
+    messagesRef,
+    orderBy('timestamp', 'asc')
+  );
 
   const unsubscribe = onSnapshot(q, async (snapshot) => {
     const messagesData = await Promise.all(
       snapshot.docs.map(async (doc) => {
         const messageData = doc.data();
-        return {
-          id: doc.id,
-          ...messageData,
-        };
+        if (
+          (messageData.senderId === senderId && messageData.receiverId === receiverId) ||
+          (messageData.senderId === receiverId && messageData.receiverId === senderId)
+        ) {
+          return {
+            id: doc.id,
+            ...messageData,
+          };
+        }
+        return null;
       })
     );
-    setMessages(messagesData);
+    setMessages(messagesData.filter(message => message !== null));
   });
 
   return unsubscribe;
