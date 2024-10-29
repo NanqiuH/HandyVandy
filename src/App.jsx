@@ -7,6 +7,7 @@ import CreateProfilePage from './components/CreateProfilePage/CreateProfilePage'
 import ProfileListPage from './components/ProfileListPage/ProfileListPage';
 import ProfileViewPage from './components/ProfileViewPage/ProfileViewPage';
 import ChatPage from './components/ChatPage/ChatPage'; 
+import ReviewPage from './components/ReviewPage/ReviewPage';
 import CreatePostingPage from './components/CreatePostingPage/CreatePostingPage';
 import ViewPostingsPage from './components/ViewPostingsPage/ViewPostingsPage';
 import SinglePostViewPage from './components/SinglePostViewPage/SinglePostViewPage';
@@ -24,6 +25,7 @@ function App() {
         <Route path='/profile-list' element={<ProfileListPage />} />
         <Route path="/profile/:id" element={<ProfileViewPage />} />
         <Route path="/chat/:id" element={<ChatPage />} />
+        <Route path="/review/:id" element={<ReviewPage />} />
         <Route path='/create-posting' element={<CreatePostingPage />} />
         <Route path='/posting-list' element={<ViewPostingsPage />} />
         <Route path="/posting/:id" element={<SinglePostViewPage />} />

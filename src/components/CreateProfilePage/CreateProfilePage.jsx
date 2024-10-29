@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate from React Router
+import { useNavigate } from "react-router-dom";
 import styles from "./CreateProfilePage.module.css";
 import Header from "../Layout/Header"
 import { db } from "../../firebase";
@@ -15,6 +15,8 @@ function CreateProfilePage() {
     lastName: "",
     bio: "",
     profileImage: null,
+    rating: 0,
+    numRatings: 0,
   });
 
   const navigate = useNavigate();
@@ -56,6 +58,8 @@ function CreateProfilePage() {
         lastName: formData.lastName,
         bio: formData.bio,
         profileImageUrl: profileImageUrl,
+        rating: formData.rating,
+        numRatings: formData.numRatings,
       });
 
       alert("Profile created successfully");
