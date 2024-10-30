@@ -148,3 +148,17 @@
   color: #aaa;
   text-align: right;
 }
+
+.reviewButton {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #28a745; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.reviewButton:hover {
+  background-color: #218838;
+}

@@ -2,71 +2,82 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./ReviewPage.module.css";
 import Header from "../Layout/Header";
-import { db, auth } from "../../firebase"; // Import Firebase Firestore and Auth
-import { collection, addDoc } from "firebase/firestore"; // Firestore functions to add documents
+import { db, auth } from "../../firebase";
+import { collection, addDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 
 function ReviewPage() {
-  const location = useLocation(); // Get location from React Router
-  const { revieweeId, revieweeName } = location.state; // Destructure revieweeId and revieweeName
-  
-  // State to manage form data
+  const location = useLocation();
+  const { revieweeId, revieweeName } = location.state;
+
   const [formData, setFormData] = useState({
-    rating: 1, // Default rating
+    rating: 1,
     comment: "",
   });
 
-  // State to manage validation errors
   const [commentError, setCommentError] = useState(false);
-
-  // Hook to navigate to a different page after form submission
   const navigate = useNavigate();
 
-  // Function to handle changes to input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
-
-    // Reset error state when user starts typing in the comment field
     if (name === "comment") setCommentError(false);
   };
 
-  // Form submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation checks for empty fields
     if (formData.comment.trim() === "") {
       setCommentError(true);
       return;
     }
 
     try {
-      const user = auth.currentUser; // Get current authenticated user
+      const user = auth.currentUser;
       if (!user) {
-        throw new Error("User not authenticated"); // If not authenticated, throw an error
+        throw new Error("User not authenticated");
       }
 
-      const timestamp = new Date().toISOString(); // Create a timestamp for when the review is created
-
-      // Add the new review to the "reviews" collection in Firestore
+      const timestamp = new Date().toISOString();
       await addDoc(collection(db, "reviews"), {
         rating: formData.rating,
         comment: formData.comment,
-        reviewerUID: user.uid, // Store the user ID of the reviewer
-        revieweeId: revieweeId, // Store the ID of the person being reviewed
-        revieweeName: revieweeName, // Store the name of the person being reviewed
-        createdAt: timestamp, // Add timestamp to the document
+        reviewerUID: user.uid,
+        revieweeId,
+        revieweeName,
+        createdAt: timestamp,
       });
 
-      alert("Review submitted successfully"); // Show success message
+      // Fetch reviewee's profile data
+      const revieweeRef = doc(db, "profiles", revieweeId);
+      const revieweeSnapshot = await getDoc(revieweeRef);
 
-      // Navigate to the profile of the reviewee after submitting the review
-      navigate(`/profile/${revieweeId}`); // Redirect to the reviewee's profile
+      if (revieweeSnapshot.exists()) {
+        const revieweeData = revieweeSnapshot.data();
+        const currentRating = revieweeData.rating || 0;
+        const currentNumRatings = revieweeData.numRatings || 0;
+
+        // Calculate the new rating
+        const newNumRatings = currentNumRatings + 1;
+        const newRating =
+          (currentRating * currentNumRatings + parseInt(formData.rating)) /
+          newNumRatings;
+
+        // Update the reviewee's profile with the new rating and numRatings
+        await updateDoc(revieweeRef, {
+          rating: newRating,
+          numRatings: newNumRatings,
+        });
+
+        alert("Review submitted successfully");
+        navigate(`/profile/${revieweeId}`);
+      } else {
+        throw new Error("Reviewee profile not found");
+      }
     } catch (error) {
-      console.error("Error adding document: ", error); // Handle any errors during the form submission
+      console.error("Error adding review or updating profile: ", error);
     }
   };
 
@@ -79,10 +90,9 @@ function ReviewPage() {
             <section className={styles.formSection}>
               <div className={styles.formContainer}>
                 <header className={styles.header}>
-                  <h1 className={styles.title}>Leave a Review for {revieweeName}</h1> {/* Display the reviewee's name */}
+                  <h1 className={styles.title}>Leave a Review for {revieweeName}</h1>
                 </header>
                 <form onSubmit={handleSubmit} className={styles.form}>
-                  {/* Rating Selection */}
                   <div className={styles.inputGroup}>
                     <label htmlFor="rating" className={styles.label}>
                       Rating
@@ -102,7 +112,6 @@ function ReviewPage() {
                     </select>
                   </div>
 
-                  {/* Comment Field */}
                   <div className={`${styles.inputGroup} ${commentError ? styles.error : ""}`}>
                     <label htmlFor="comment" className={styles.label}>
                       Comment
