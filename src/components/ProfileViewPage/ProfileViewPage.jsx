@@ -13,6 +13,27 @@ function ProfileViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [receiverFullName, setReceiverFullName] = useState('');
+  const { id: receiverId } = useParams();
+
+
+  useEffect(() => {
+    const fetchReceiverFullName = async () => {
+      try {
+        const userDocRef = doc(db, 'profiles', receiverId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const { firstName, lastName } = userDocSnap.data();
+          setReceiverFullName(`${firstName} ${lastName}`);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchReceiverFullName();
+  }, [receiverId]);
 
   useEffect(() => {
     const fetchProfileAndReviews = async () => {
@@ -124,7 +145,7 @@ function ProfileViewPage() {
                           { "★".repeat(Math.round(review.rating)) + "☆".repeat(5 - Math.round(review.rating)) }
                         </p>
                         <p className={styles.reviewComment}>{review.comment}</p>
-                        <p className={styles.reviewerName}>— {review.reviewerName}</p>
+                        <p className={styles.reviewerName}>Posted by: {receiverFullName || 'User'} {review.reviewerName}</p>
                       </div>
                       <p className={styles.reviewDate}>
                         {new Date(review.createdAt).toLocaleString()}
