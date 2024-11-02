@@ -1,70 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import {APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
+import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { db, auth } from '../firebase'; 
+import { onAuthStateChanged } from "firebase/auth";
 import styles from './SearchPostNearby.module.css';
 import Button from '@mui/material/Button';
+import Header from '../components/Layout/Header';
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
     lat: 36.1420163, 
     lng: -86.8038583
   });
-  // store clicked location
   const [selectedLocation, setSelectedLocation] = useState({});
-  // store show dialog state to add location
   const [showDialog, setShowDialog] = useState(false);
-  // store dialog location
-  const [dialogLocation, setDialogLocation] = useState("");
+  const [dialogLocation, setDialogLocation] = useState({});
   const [listOfLocations, setListOfLocations] = useState([]);
+  const [user, setUser] = useState(null);
 
-  // handle click on map
-  const handleMapClick = (mapProps) => {
-    // checks if location clicked is valid
-    if (mapProps.detail.placeId) {
-      const lat = mapProps.detail.latLng.lat;
-      const lng = mapProps.detail.latLng.lng;
-      setShowDialog(true);
-      setDialogLocation({ lat, lng });
-      setSelectedLocation({ lat, lng });
-    } else {
-      // show alert message
-      alert("Please select the specific location");
-    }
-  };
-
-  // add location to show in a list
-  const onAddLocation = () => {
-    // Create a Google Maps Geocoder instance
-    const geocoder = new window.google.maps.Geocoder();
-
-    // Reverse geocode the coordinates to get the place name
-    geocoder.geocode({ location: selectedLocation }, (results, status) => {
-      if (status === "OK") {
-        if (results[0]) {
-          setListOfLocations([
-            ...listOfLocations,
-            { name: results[0].formatted_address, location: selectedLocation },
-          ]);
-          setShowDialog(false);
-        }
-      } else {
-        console.error("Geocoder failed due to: " + status);
-      }
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
     });
-  };
-
-  // displays marker on the map for the selected location
-  const onViewLocation = (loc) => {
-    setMarkerLocation({ lat: loc.lat, lng: loc.lng });
-  };
-
-  // deletes selected location from the list
-  const onDeleteLocation = (loc) => {
-    let updatedList = listOfLocations.filter(
-      (l) => loc.lat !== l.location.lat && loc.lng !== l.location.lng
-    );
-    setListOfLocations(updatedList);
-  };
-
+    fetchLocations();
+  }, []);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -82,43 +41,106 @@ const SearchPostNearby = () => {
     }
   }, []);
 
+  const handleMapClick = async (mapProps) => {
+    if (mapProps.detail.placeId) {
+      const lat = mapProps.detail.latLng.lat;
+      const lng = mapProps.detail.latLng.lng;
+      try {
+        const locationName = await getLocationName(lat, lng);
+        setShowDialog(true);
+        setDialogLocation({ lat, lng });
+        setSelectedLocation({ lat, lng, name: locationName, userId: user.uid });
+      } catch (error) {
+        console.error("Error getting location name:", error);
+        alert("Failed to get location name. Please try again.");
+      }
+    } else {
+      alert("Please select the specific location");
+    }
+  };
+
+  const getLocationName = async (lat, lng) => {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`);
+    const data = await response.json();
+    if (data.status === "OK" && data.results && data.results.length > 0) {
+      return data.results[0].formatted_address;
+    } else {
+      throw new Error(data.error_message || "Failed to get location name");
+    }
+  };
+
+  const saveLocation = async () => {
+    try {
+      await addDoc(collection(db, "locations"), selectedLocation);
+      fetchLocations();
+      setShowDialog(false); // Close the dialog after saving
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  const fetchLocations = async () => {
+    const querySnapshot = await getDocs(collection(db, "locations"));
+    const locations = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    setListOfLocations(locations);
+  };
+
+  const onDeleteLocation = async (loc) => {
+    if (loc.userId === user.uid) {
+      try {
+        await deleteDoc(doc(db, "locations", loc.id));
+        fetchLocations();
+      } catch (e) {
+        console.error("Error deleting document: ", e);
+      }
+    } else {
+      alert("You do not have permission to delete this location.");
+    }
+  };
+
+  const onViewLocation = (loc) => {
+    setMarkerLocation({ lat: loc.lat, lng: loc.lng });
+  };
+
   return (
     <>
+      <Header />
       <div className={styles.app}>
-        <div className={styles.mapContainer}>
+      <div className={styles.mapContainer}>
         <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} onLoad={() => console.log('Maps API has loaded.')}>
-        <Map
-          style={{ borderRadius: "20px" }}
-          defaultZoom={13}
-          defaultCenter={markerLocation}
-          gestureHandling={"greedy"}
-          disableDefaultUI
-          onClick={(mapProps) => handleMapClick(mapProps)}
-        >
-          {showDialog && (
-            // displays a dialog to add clicked location
-            <InfoWindow position={dialogLocation}>
-              <button className={styles.appButton} onClick={onAddLocation}>
-                Add this location
-              </button>
-            </InfoWindow>
-          )}
-          <Marker position={markerLocation} />
-        </Map>
+          <Map
+            style={{ borderRadius: "20px" }}
+            defaultZoom={13}
+            defaultCenter={markerLocation}
+            gestureHandling={"greedy"}
+            disableDefaultUI
+            onClick={(mapProps) => handleMapClick(mapProps)}
+          >
+            {showDialog && (
+              <InfoWindow position={dialogLocation}>
+                <div>
+                  <p>Do you want to save this location?</p>
+                  <Button onClick={saveLocation}>Save</Button>
+                  <Button onClick={() => setShowDialog(false)}>Cancel</Button>
+                </div>
+              </InfoWindow>
+            )}
+            <Marker position={markerLocation} />
+          </Map>
         </APIProvider>
-        </div>
+      </div>
 
       <div className={styles.listContainer}>
         {listOfLocations.length > 0 ? (
           <div>
             <p className={styles.listHeading}>List of Selected Locations</p>
             {listOfLocations.map((loc) => (
-              <div key={loc.location.lat + loc.location.lng} className={styles.listItem}>
+              <div key={loc.id} className={styles.listItem}>
                 <div className={styles.card}>
                   <p className={styles.latLngText}>{loc.name}</p>
                   <div className={styles.buttonContainer}>
-                    <Button className={styles.viewButton} handleClick={() => onViewLocation(loc.location)}>View</Button>
-                    <Button className={styles.deleteButton} handleClick={() => onDeleteLocation(loc.location)}>Delete</Button>
+                    <Button className={styles.viewButton} onClick={() => onViewLocation(loc)}>View</Button>
+                    <Button className={styles.deleteButton} onClick={() => onDeleteLocation(loc)}>Delete</Button>
                   </div>
                 </div>
               </div>
@@ -126,18 +148,16 @@ const SearchPostNearby = () => {
           </div>
         ) : (
           <div>
-            <p className={styles.noLocationMessage}>
+            <p className={styles.listHeading}>
               Select a location from map to show in a list
             </p>
           </div>
         )}
       </div>
     </div>
-
-
-      
     </>
+
   );
-}
+};
 
 export default SearchPostNearby;
