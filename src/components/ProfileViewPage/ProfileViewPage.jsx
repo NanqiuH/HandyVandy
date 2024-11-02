@@ -5,6 +5,7 @@ import { db } from "../../firebase";
 import styles from "./ProfileViewPage.module.css";
 import Header from "../Layout/Header";
 import anonProfile from "../../images/anon_profile.png";
+import CustomMap from "../../maps/CustomMap";
 
 function ProfileViewPage() {
   const { id } = useParams();
@@ -123,6 +124,8 @@ function ProfileViewPage() {
             <div className={styles.profileDetails}>
               <h2 className={styles.bioTitle}>Bio</h2>
               <p className={styles.bio}>{profile.bio}</p>
+              <h2 className={styles.mapTitle}>User Location</h2>
+              <CustomMap />
               <h3 className={styles.postsTitle}>Posts</h3>
               {profile.posts && profile.posts.length > 0 ? (
                 <ul className={styles.postsList}>
