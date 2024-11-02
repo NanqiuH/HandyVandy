@@ -86,16 +86,19 @@ const SearchPostNearby = () => {
   };
 
   const onDeleteLocation = async (loc) => {
-    if (loc.userId === user.uid) {
-      try {
-        await deleteDoc(doc(db, "locations", loc.id));
-        fetchLocations();
-      } catch (e) {
-        console.error("Error deleting document: ", e);
+    const confirmed = window.confirm("Are you sure you want to delete this location?");
+    if(confirmed) {
+      if (loc.userId === user.uid) {
+        try {
+          await deleteDoc(doc(db, "locations", loc.id));
+          fetchLocations();
+        } catch (e) {
+          console.error("Error deleting document: ", e);
+        }
+      } else {
+        alert("You do not have permission to delete this location.");
       }
-    } else {
-      alert("You do not have permission to delete this location.");
-    }
+    } 
   };
 
   const onViewLocation = (loc) => {
@@ -140,7 +143,9 @@ const SearchPostNearby = () => {
                   <p className={styles.latLngText}>{loc.name}</p>
                   <div className={styles.buttonContainer}>
                     <Button className={styles.viewButton} onClick={() => onViewLocation(loc)}>View</Button>
-                    <Button className={styles.deleteButton} onClick={() => onDeleteLocation(loc)}>Delete</Button>
+                    {loc.userId === user?.uid && (
+                      <Button className={styles.deleteButton} onClick={() => onDeleteLocation(loc)}>Delete</Button>
+                    )}
                   </div>
                 </div>
               </div>
