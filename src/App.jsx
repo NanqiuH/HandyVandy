@@ -13,6 +13,7 @@ import ViewPostingsPage from './components/ViewPostingsPage/ViewPostingsPage';
 import SinglePostViewPage from './components/SinglePostViewPage/SinglePostViewPage';
 import SearchPostingsPage from './components/SearchPostingsPage/SearchPostingsPage';
 import CategoryPage from './components/CategoryPage/CategoryPage';
+import SearchPostNearby from './maps/SearchPostNearby';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/posting/:id" element={<SinglePostViewPage />} />
         <Route path='/search-posting' element={<SearchPostingsPage />} />
         <Route path='/category' element={<CategoryPage />} />
+        <Route path='/search-post-nearby' element={<SearchPostNearby />} />
       </Routes>
     </BrowserRouter>
   );
