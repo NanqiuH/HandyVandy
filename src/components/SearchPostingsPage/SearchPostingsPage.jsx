@@ -94,6 +94,19 @@ function SearchPostingsPage() {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
+  const getClassName = (type) => {
+    switch (type) {
+      case 'offering':
+        return `${styles.resultItem} ${styles.offering}`;
+      case 'requesting':
+        return `${styles.resultItem} ${styles.requesting}`;
+      case 'all':
+        return `${styles.resultItem} ${styles.all}`;
+      default:
+        return styles.resultItem;
+    }
+  };
+
   const paginatedResults = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
@@ -164,7 +177,7 @@ function SearchPostingsPage() {
               {paginatedResults.length > 0 ? (
                 <ul className={styles.resultsList}>
                   {paginatedResults.map((posting) => (
-                    <li key={posting.id} className={styles.resultItem}>
+                    <li key={posting.id} className={getClassName(posting.serviceType)}>
                       <p><strong>Posting Name:</strong> {posting.postingName}</p>
                       <p><strong>Description:</strong> {posting.description}</p>
                       <p><strong>Price:</strong> {posting.price}</p>

@@ -172,13 +172,22 @@ function ViewPostingsPage() {
               sortedPostings.map((posting) => {
                 const postingImageUrl = posting.postingImageUrl || HandyVandyLogo;
                 console.log(postingImageUrl);
+                console.log(postingImageUrl);
+                let serviceTypeClass;
+                if (posting.serviceType === "offering") {
+                  serviceTypeClass = styles.offeringStyle;
+                } else if (posting.serviceType === "requesting") {
+                  serviceTypeClass = styles.requestingStyle;
+                } else if (posting.serviceType === "all") {
+                  serviceTypeClass = styles.allStyle;
+                }
                 return (
                   <Link
                     to={`/posting/${posting.id}`} 
                     key={posting.id} 
                     className={styles.postingLink}
                   >
-                    <div className={styles.postingCard}>
+                    <div className={`${styles.postingCard} ${serviceTypeClass}`}>
                       {/* Display posting image */}
                       <img
                         src={postingImageUrl}

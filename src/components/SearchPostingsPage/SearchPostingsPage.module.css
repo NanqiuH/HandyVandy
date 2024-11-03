@@ -91,6 +91,16 @@
   border-radius: 4px;
 }
 
+.offering {
+  background-color: lightgreen;
+}
+.requesting {
+  background-color: lightcoral;
+}
+.all {
+  background-color: lightblue;
+}
+
 .resultTitle {
   font-size: 20px;
   font-weight: bold;
