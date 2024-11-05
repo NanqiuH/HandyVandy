@@ -171,8 +171,6 @@ function ViewPostingsPage() {
             ) : (
               sortedPostings.map((posting) => {
                 const postingImageUrl = posting.postingImageUrl || HandyVandyLogo;
-                console.log(postingImageUrl);
-                console.log(postingImageUrl);
                 let serviceTypeClass;
                 if (posting.serviceType === "offering") {
                   serviceTypeClass = styles.offeringStyle;
