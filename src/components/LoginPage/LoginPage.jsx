@@ -2,14 +2,12 @@ import React from "react";
 import styles from "./LoginPage.module.css";
 import LoginForm from "./LoginForm";
 import Header from "../Layout/Header";
-import Home from "../../Home";
 
 // Note: SocialLogin is now deprecated
 
 function LoginPage() {
   return (
-    <Home>
-      <div>
+    <div>
       <Header />  
       <main className={styles.loginPage}>
         <div className={styles.container}>
@@ -42,7 +40,6 @@ function LoginPage() {
         </div>
       </main>
     </div>
-    </Home>
   );
 }
 
