@@ -3,10 +3,12 @@ import styles from "./SignUpPage.module.css";
 import SignUpForm from "./SignUpForm";
 import SocialSignUp from "./SocialSignUp";
 import Header from "../Layout/Header";
+import Home from "../../Home";
 
 function SignUpPage() {
   return (
-    <div>
+    <Home>
+      <div>
     <Header />
     <main className={styles.signUpPage}>
       <div className={styles.container}>
@@ -40,6 +42,7 @@ function SignUpPage() {
       </div>
     </main>
     </div>
+    </Home>
   );
 }
 
