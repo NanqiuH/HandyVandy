@@ -1,0 +1,63 @@
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    align-items: center;
+    width: 100%;
+}
+
+.background {
+    display: flex;
+    height: 100vh;
+    background-color: #16171B;
+}
+
+/* Don't want to break existing logic!*/
+
+.left-login, .right-login {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-login {
+    flex-direction: column;
+    color: #E0E0E0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+ input[type="text"]{
+    width: 600px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    outline: none;
+}
+
+input[type="password"] label{
+    width: 600px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    outline: none;
+}
+
+ .left-login img {
+    max-width: 50%;
+}
+
+.right-login img {
+    max-width: fit-content;
+}
+
+.login-text{
+    margin-bottom: 2rem;
+}

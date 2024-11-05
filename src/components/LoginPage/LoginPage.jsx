@@ -1,8 +1,9 @@
 import React from "react";
 import styles from "./LoginPage.module.css";
 import LoginForm from "./LoginForm";
-import SocialLogin from "./SocialLogin";
 import Header from "../Layout/Header";
+
+// Note: SocialLogin is now deprecated
 
 function LoginPage() {
   return (
@@ -27,7 +28,6 @@ function LoginPage() {
                     <span className={styles.brandName}>HandyVandy</span>
                   </h1>
                 </header>
-                <SocialLogin />
                 <div className={styles.divider}>
                   <hr className={styles.dividerLine} />
                   <span className={styles.dividerText}>OR</span>
