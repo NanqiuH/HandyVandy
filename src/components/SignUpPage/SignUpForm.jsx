@@ -39,7 +39,6 @@ function SignUpForm() {
       await createUserWithEmailAndPassword(auth, email, password);
       console.log('User created successfully');
       navigate('/create-profile');
-      alert('User created successfully');
     } catch (error) {
       console.error(error);
       alert('User creation failed. Please check your email and password.');

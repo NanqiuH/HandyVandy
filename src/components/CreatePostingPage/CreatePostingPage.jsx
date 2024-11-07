@@ -127,8 +127,6 @@ function CreatePostingPage() {
         createdAt: timestamp, // Add timestamp to the document
       });
 
-      alert("Posting created successfully"); // Show success message
-
       navigate("/posting-list"); // Redirect to the postings list page after success
     } catch (error) {
       console.error("Error adding document: ", error); // Handle any errors during the form submission

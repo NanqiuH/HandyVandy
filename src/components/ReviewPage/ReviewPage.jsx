@@ -71,7 +71,6 @@ function ReviewPage() {
           numRatings: newNumRatings,
         });
 
-        alert("Review submitted successfully");
         navigate(`/profile/${revieweeId}`);
       } else {
         throw new Error("Reviewee profile not found");

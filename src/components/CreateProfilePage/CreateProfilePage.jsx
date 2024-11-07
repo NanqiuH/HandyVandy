@@ -62,8 +62,6 @@ function CreateProfilePage() {
         numRatings: formData.numRatings,
       });
 
-      alert("Profile created successfully");
-
       navigate("/posting-list");
     } catch (error) {
       console.error("Error adding document: ", error);
