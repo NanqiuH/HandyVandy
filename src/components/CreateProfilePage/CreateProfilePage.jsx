@@ -87,7 +87,6 @@ function CreateProfilePage() {
                       First Name
                     </label>
                     <input
-                      type="text"
                       id="firstName"
                       name="firstName"
                       value={formData.firstName}
@@ -102,7 +101,6 @@ function CreateProfilePage() {
                       Middle Name (optional)
                     </label>
                     <input
-                      type="text"
                       id="middleName"
                       name="middleName"
                       value={formData.middleName}
@@ -116,7 +114,6 @@ function CreateProfilePage() {
                       Last Name
                     </label>
                     <input
-                      type="text"
                       id="lastName"
                       name="lastName"
                       value={formData.lastName}
