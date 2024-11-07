@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom"; 
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db, auth, storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Header from "../Layout/Header";
@@ -102,7 +102,6 @@ function SinglePostingPage() {
       const postingRef = doc(db, "postings", id);
       const postingSnap = await getDoc(postingRef);
     
-      // Get the existing 'createdAt' timestamp, if available
       const existingCreatedAt = postingSnap.exists() ? postingSnap.data().createdAt : new Date().toISOString();
       let postingImageUrl = posting.postingImageUrl;
 
@@ -130,6 +129,20 @@ function SinglePostingPage() {
     } catch (error) {
       console.error("Error updating posting:", error);
       alert("Failed to update posting.");
+    }
+  };
+
+  const handleDeletePost = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+    if (!confirmDelete) return;
+
+    try {
+      const postingRef = doc(db, "postings", id);
+      await deleteDoc(postingRef);
+      navigate("/posting-list");
+    } catch (error) {
+      console.error("Error deleting posting:", error);
+      alert("Failed to delete post.");
     }
   };
 
@@ -286,13 +299,23 @@ function SinglePostingPage() {
               <div className={styles.actionButtons}>
                 {isOwner ? (
                   isEditing ? (
-                    <button onClick={handleSaveChanges} className={styles.saveButton}>
-                      Save Changes
-                    </button>
+                    <>
+                      <button onClick={handleSaveChanges} className={styles.saveButton}>
+                        Save Changes
+                      </button>
+                      <button onClick={handleDeletePost} className={styles.deleteButton}>
+                        Delete Post
+                      </button>
+                    </>
                   ) : (
-                    <button onClick={handleEditToggle} className={styles.editButton}>
-                      Edit Posting
-                    </button>
+                    <>
+                      <button onClick={handleEditToggle} className={styles.editButton}>
+                        Edit Posting
+                      </button>
+                      <button onClick={handleDeletePost} className={styles.deleteButton}>
+                        Delete Post
+                      </button>
+                    </>
                   )
                 ) : (
                   <>

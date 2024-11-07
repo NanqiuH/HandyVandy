@@ -167,6 +167,10 @@
   cursor: pointer;
 }
 
+.saveButton:hover {
+  background-color: #B59B5A; 
+}
+
 .row {
   display: flex;
   gap: 20px;
@@ -201,4 +205,21 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.editButton:hover {
+  background-color: #B59B5A; 
+}
+
+.deleteButton {
+  background-color: #000;
+  color: #C5B783;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background-color: #B59B5A; 
 }
