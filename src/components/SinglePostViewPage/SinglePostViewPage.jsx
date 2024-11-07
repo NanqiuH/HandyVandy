@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom"; 
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db, auth, storage } from "../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Header from "../Layout/Header";
 import styles from "./SinglePostViewPage.module.css";
 import HandyVandyLogo from "../../images/HandyVandyV.png";
@@ -13,6 +14,16 @@ function SinglePostingPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedData, setUpdatedData] = useState({
+    postingName: "",
+    description: "",
+    price: "",
+    serviceType: "",
+    category: "",
+    postingImage: null,
+  });
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const fetchPosting = async () => {
@@ -23,6 +34,17 @@ function SinglePostingPage() {
         if (docSnap.exists()) {
           const postingData = docSnap.data();
           setPosting(postingData);
+          setUpdatedData({
+            postingName: postingData.postingName,
+            description: postingData.description,
+            price: postingData.price,
+            serviceType: postingData.serviceType,
+            category: postingData.category,
+            postingImage: null,
+          });
+
+          const currentUser = auth.currentUser;
+          setIsOwner(currentUser && currentUser.uid === postingData.postingUID);
           
           if (postingData.postingUID) {
             const userDocRef = doc(db, "profiles", postingData.postingUID);
@@ -50,6 +72,67 @@ function SinglePostingPage() {
     fetchPosting();
   }, [id]);
 
+  const handleEditToggle = () => {
+    if (isOwner) {
+      setIsEditing(!isEditing);
+    } else {
+      alert("You can only edit your own posting.");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    setUpdatedData((prevData) => ({
+      ...prevData,
+      postingImage: e.target.files[0],
+    }));
+  };
+
+  const handleSaveChanges = async (e) => {
+    e.preventDefault();
+
+    try {
+      const postingRef = doc(db, "postings", id);
+      const postingSnap = await getDoc(postingRef);
+    
+      // Get the existing 'createdAt' timestamp, if available
+      const existingCreatedAt = postingSnap.exists() ? postingSnap.data().createdAt : new Date().toISOString();
+      let postingImageUrl = posting.postingImageUrl;
+
+      if (updatedData.postingImage) {
+        const imageRef = ref(storage, `postingImages/${updatedData.postingImage.name}`);
+        await uploadBytes(imageRef, updatedData.postingImage);
+        postingImageUrl = await getDownloadURL(imageRef);
+      }
+
+      const timestamp = new Date().toISOString();
+
+      await updateDoc(postingRef, {
+        postingName: updatedData.postingName,
+        description: updatedData.description,
+        price: updatedData.price,
+        serviceType: updatedData.serviceType,
+        category: updatedData.category,
+        postingImageUrl: postingImageUrl,
+        updatedAt: timestamp,
+        createdAt: existingCreatedAt,
+      });
+
+      setPosting({ ...updatedData, postingImageUrl, createdAt: existingCreatedAt, updatedAt: timestamp });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating posting:", error);
+      alert("Failed to update posting.");
+    }
+  };
+
   const handlePurchase = () => {
     alert(`You have purchased: ${posting.postingName}`);
   };
@@ -76,32 +159,152 @@ function SinglePostingPage() {
       <main className={styles.postingDetailPage}>
         <div className={styles.container}>
           <header className={styles.header}>
-            <h1 className={styles.title}>{posting.postingName}</h1>
+            <h1 className={styles.title}>{isEditing ? "Edit Post" : posting.postingName}</h1>
           </header>
+
           <div className={styles.postingContent}>
             <img
               src={postingImageUrl}
               alt={posting.postingName}
               className={styles.postingImage}
             />
-            <div className={styles.postingDetails}>
-              <p className={styles.postingDescription}>{posting.description}</p>
-              <p className={styles.postingPrice}>Price: ${posting.price}</p>
-              <p className={styles.postingType}>
-                {posting.serviceType === "offering" ? "Offering" : "Requesting"}
-              </p>
+            <div className={isEditing ? styles.editModeContainer : styles.postingDetails}>
+              {isEditing ? (
+                <>
+                  <label>Posting Name:</label>
+                  <input
+                    type="text"
+                    name="postingName"
+                    value={updatedData.postingName}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    placeholder="Posting Name"
+                  />
+                  <label>Description:</label>
+                  <textarea
+                    name="description"
+                    value={updatedData.description}
+                    onChange={handleInputChange}
+                    className={styles.textarea}
+                    placeholder="Description"
+                  />
+
+                  {/* Change Image Field */}
+                  <div className={styles.inputGroup}>
+                    <label>Change Image:</label>
+                    <input
+                      type="file"
+                      name="postingImage"
+                      onChange={handleImageChange}
+                      className={styles.inputFile}
+                    />
+                  </div>
+                  
+                  {/* Price, Service Type, and Category Fields Side by Side */}
+                  <div className={styles.row}>
+                    {/* Price Field */}
+                    <div className={`${styles.inputGroup} ${styles.priceInputContainer}`}>
+                      <label htmlFor="price" className={styles.label}>
+                        Price
+                      </label>
+                      <div className={styles.priceInputContainer}>
+                        <span className={styles.dollarSign}>$</span>
+                        <input
+                          type="number"
+                          id="price"
+                          name="price"
+                          value={updatedData.price}
+                          onChange={handleInputChange}
+                          className={styles.input}
+                          required
+                          min="0"
+                          step="any"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Service Type Field */}
+                    <div className={styles.inputGroup}>
+                      <label htmlFor="serviceType" className={styles.label}>
+                        Service Type
+                      </label>
+                      <select
+                        id="serviceType"
+                        name="serviceType"
+                        value={updatedData.serviceType}
+                        onChange={handleInputChange}
+                        className={styles.select}
+                      >
+                        <option value="offering">Offering</option>
+                        <option value="requesting">Requesting</option>
+                      </select>
+                    </div>
+
+                    {/* Category Field */}
+                    <div className={styles.inputGroup}>
+                      <label htmlFor="category" className={styles.label}>
+                        Category
+                      </label>
+                      <select
+                        id="category"
+                        name="category"
+                        value={updatedData.category}
+                        onChange={handleInputChange}
+                        className={styles.select}
+                      >
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="Handyman">Handyman</option>
+                        <option value="Tutoring">Tutoring</option>
+                        <option value="Delivery">Delivery</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className={styles.postingDescription}>{posting.description}</p>
+                  <p className={styles.postingPrice}>Price: ${posting.price}</p>
+                  <p className={styles.postingType}>
+                    {posting.serviceType === "offering" ? "Offering" : "Requesting"}
+                  </p>
+                  <p className={styles.postingCategory}>Category: {posting.category}</p>
+                </>
+              )}
               <p className={styles.postingTimestamp}>
                 Posted on: {new Date(posting.createdAt).toLocaleString()}
               </p>
+              {posting.updatedAt && (
+                <p className={styles.postingTimestamp}>
+                  Last updated on: {new Date(posting.updatedAt).toLocaleString()}
+                </p>
+              )}
               <p className={styles.postingUser}>
                 Posted by: {user ? `${user.firstName} ${user.lastName}` : "User not found"}
               </p>
-              <button className={styles.purchaseButton} onClick={handlePurchase}>
-                Purchase
-              </button>
-              <button className={styles.messageButton} onClick={handleMessage}>
-                Message {user ? `${user.firstName} ${user.lastName}` : "the seller"}
-              </button>
+
+              <div className={styles.actionButtons}>
+                {isOwner ? (
+                  isEditing ? (
+                    <button onClick={handleSaveChanges} className={styles.saveButton}>
+                      Save Changes
+                    </button>
+                  ) : (
+                    <button onClick={handleEditToggle} className={styles.editButton}>
+                      Edit Posting
+                    </button>
+                  )
+                ) : (
+                  <>
+                    <button className={styles.purchaseButton} onClick={handlePurchase}>
+                      Purchase
+                    </button>
+                    <button className={styles.messageButton} onClick={handleMessage}>
+                      Message {user ? `${user.firstName} ${user.lastName}` : "the seller"}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
