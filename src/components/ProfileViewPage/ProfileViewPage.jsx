@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../firebase";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc } from "firebase/firestore";
+import { db, storage, auth } from "../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./ProfileViewPage.module.css";
 import Header from "../Layout/Header";
 import anonProfile from "../../images/anon_profile.png";
@@ -15,6 +16,15 @@ function ProfileViewPage() {
   const [reviews, setReviews] = useState([]);
   const [receiverFullName, setReceiverFullName] = useState('');
   const { id: receiverId } = useParams();
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedData, setUpdatedData] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    bio: "",
+    profileImage: null,
+  });
+  const [isOwner, setIsOwner] = useState(false);
 
 
   useEffect(() => {
@@ -35,6 +45,58 @@ function ProfileViewPage() {
     fetchReceiverFullName();
   }, [receiverId]);
 
+  const handleEditToggle = () => {
+    if (isOwner) {
+      setIsEditing(!isEditing);
+    } else {
+      alert("You can only edit your own profile.");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    setUpdatedData((prevData) => ({
+      ...prevData,
+      profileImage: e.target.files[0],
+    }));
+  };
+
+  const handleSaveChanges = async (e) => {
+    e.preventDefault();
+
+    try {
+      let profileImageUrl = profile.profileImageUrl;
+
+      if (updatedData.profileImage) {
+        const imageRef = ref(storage, `profileImages/${updatedData.profileImage.name}`);
+        await uploadBytes(imageRef, updatedData.profileImage);
+        profileImageUrl = await getDownloadURL(imageRef);
+      }
+
+      const profileRef = doc(db, "profiles", id);
+      await updateDoc(profileRef, {
+        firstName: updatedData.firstName,
+        middleName: updatedData.middleName,
+        lastName: updatedData.lastName,
+        bio: updatedData.bio,
+        profileImageUrl: profileImageUrl,
+      });
+
+      setProfile({ ...updatedData, profileImageUrl });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile.");
+    }
+  };
+
   useEffect(() => {
     const fetchProfileAndReviews = async () => {
       try {
@@ -43,6 +105,8 @@ function ProfileViewPage() {
 
         if (profileSnap.exists()) {
           setProfile(profileSnap.data());
+
+          setUpdatedData(profileSnap.data());
 
           const reviewsQuery = query(
             collection(db, "reviews"),
@@ -56,6 +120,9 @@ function ProfileViewPage() {
 
           fetchedReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
           setReviews(fetchedReviews);
+
+          const currentUser = auth.currentUser;
+          setIsOwner(currentUser && currentUser.uid === id); // Only allow editing if the user is the owner
         } else {
           setError("Profile not found.");
         }
@@ -92,9 +159,44 @@ function ProfileViewPage() {
         <div className={styles.container}>
           <header className={styles.header}>
             <h1 className={styles.title}>
-              {profile.firstName} {profile.middleName} {profile.lastName}
+              {isEditing ? (
+                <>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={updatedData.firstName}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    placeholder="First Name"
+                  />
+                  <input
+                    type="text"
+                    name="middleName"
+                    value={updatedData.middleName}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    placeholder="Middle Name"
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={updatedData.lastName}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    placeholder="Last Name"
+                  />
+                </>
+              ) : (
+                `${profile.firstName} ${profile.middleName} ${profile.lastName}`
+              )}
             </h1>
+            {isOwner && (
+              <button onClick={handleEditToggle} className={styles.editButton}>
+                {isEditing ? "Cancel" : "Edit Profile"}
+              </button>
+            )}
           </header>
+
           <div className={styles.profileContent}>
             <div className={styles.profileSidebar}>
               <img
@@ -102,17 +204,30 @@ function ProfileViewPage() {
                 alt={`${profile.firstName} ${profile.lastName}`}
                 className={styles.profileImage}
               />
+              {isEditing && (
+                <div className={styles.inputGroup}>
+                  <label>Profile Image</label>
+                  <input
+                    type="file"
+                    name="profileImage"
+                    onChange={handleImageChange}
+                    className={styles.inputFile}
+                  />
+                </div>
+              )}
               <div className={styles.profileInfo}>
                 <div className={styles.rating}>
                   <span>{starRating}</span> ({reviews.length} reviews)
                 </div>
                 <button className={styles.friendButton}>Send Friend Request</button>
-                <button className={styles.messageButton} onClick={handleSendMessage}>Send Message</button>
+                <button className={styles.messageButton} onClick={() => navigate(`/chat/${id}`)}>
+                  Send Message
+                </button>
                 <button
                   className={styles.reviewButton}
                   onClick={() =>
                     navigate(`/review/${id}`, {
-                      state: { revieweeId: id, revieweeName: `${profile.firstName} ${profile.lastName}` }
+                      state: { revieweeId: id, revieweeName: `${profile.firstName} ${profile.lastName}` },
                     })
                   }
                 >
@@ -120,9 +235,20 @@ function ProfileViewPage() {
                 </button>
               </div>
             </div>
+
             <div className={styles.profileDetails}>
               <h2 className={styles.bioTitle}>Bio</h2>
-              <p className={styles.bio}>{profile.bio}</p>
+              {isEditing ? (
+                <textarea
+                  name="bio"
+                  value={updatedData.bio}
+                  onChange={handleInputChange}
+                  className={styles.textarea}
+                />
+              ) : (
+                <p className={styles.bio}>{profile.bio}</p>
+              )}
+              
               <h3 className={styles.postsTitle}>Posts</h3>
               {profile.posts && profile.posts.length > 0 ? (
                 <ul className={styles.postsList}>
@@ -135,6 +261,7 @@ function ProfileViewPage() {
               ) : (
                 <p>No posts available.</p>
               )}
+              
               <h3 className={styles.reviewsTitle}>Reviews</h3>
               {reviews.length > 0 ? (
                 <ul className={styles.reviewsList}>
@@ -155,6 +282,12 @@ function ProfileViewPage() {
                 </ul>
               ) : (
                 <p>No reviews yet.</p>
+              )}
+
+              {isEditing && (
+                <button onClick={handleSaveChanges} className={styles.saveButton}>
+                  Save Changes
+                </button>
               )}
             </div>
           </div>
