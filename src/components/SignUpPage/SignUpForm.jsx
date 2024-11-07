@@ -5,92 +5,92 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import MailIcon from '@mui/icons-material/Mail';
 import KeyIcon from '@mui/icons-material/Key';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 
 function SignUpForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert('Email and password cannot be empty.');
+    if (!email || !password || !confirmPassword) {
+      alert('Email, password, and password confirmation cannot be empty.');
       return;
     }
-    
+
+    if (password.length <= 6) {
+      alert('Password must be greater than 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
     try {
-        createUserWithEmailAndPassword(auth, email, password);
-        console.log('User created successfully');
-        navigate('/create-profile');
-        alert('User created successfully');
+      await createUserWithEmailAndPassword(auth, email, password);
+      console.log('User created successfully');
+      navigate('/create-profile');
+      alert('User created successfully');
     } catch (error) {
-        console.error(error);
-        alert('User creation failed. Please check your email and password.');
+      console.error(error);
+      alert('User creation failed. Please check your email and password.');
     }
   }
 
   return (
-    <form className={styles.signUpForm}>
+    <form className={styles.signUpForm} onSubmit={handleSubmit}>
       <div className={styles.inputGroup}>
-        <MailIcon
-          className={styles.inputIcon}
+        <MailIcon />
+        <input
+          className={styles.inputField}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
-        <div>
-          <label htmlFor="email" className={styles.inputLabel}>
-            Email
-            <input
-              type="email"
-              id="email"
-              placeholder="example@gmail.com"
-              className={styles.inputField}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-        </div>
       </div>
       <div className={styles.inputGroup}>
-        <KeyIcon
-          className={styles.inputIcon}
+        <KeyIcon />
+        <input
+          className={styles.inputField}
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <div>
-          <label htmlFor="password" className={styles.inputLabel}>
-            Password
-            <input
-              type="password"
-              id="password"
-              placeholder="***********"
-              className={styles.inputField}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-        </div>
-        <button
-          type="button"
-          className={styles.showPasswordButton}
-          aria-label="Show password"
+        <IconButton
+          onClick={() => setShowPassword(!showPassword)}
+          edge="end"
         >
-        </button>
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
       </div>
-      <div className={styles.formOptions}>
-        <label className={styles.rememberMe}>
-          <input type="checkbox" className={styles.checkbox} />
-          <span>Remember me</span>
-        </label>
-        <a href="#" className={styles.forgotPassword}>
-          Forgot Password?
-        </a>
+      <div className={styles.inputGroup}>
+        <KeyIcon />
+        <input
+          className={styles.inputField}
+          type={showPassword ? "text" : "password"}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+        <IconButton
+          onClick={() => setShowPassword(!showPassword)}
+          edge="end"
+        >
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
       </div>
-      <button type="submit" className={styles.signUpButton} onClick={handleSubmit}>
-        SignUp
-      </button>
-      <p className={styles.registerPrompt}>
-        Already have an account?{" "}
-        <a href="login" className={styles.registerLink}>
-          Login
-        </a>
-      </p>
+      <button className={styles.signUpButton} type="submit">Sign Up</button>
     </form>
   );
 }
