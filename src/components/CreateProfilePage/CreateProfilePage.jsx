@@ -64,7 +64,7 @@ function CreateProfilePage() {
 
       alert("Profile created successfully");
 
-      navigate("/");
+      navigate("/posting-list");
     } catch (error) {
       console.error("Error adding document: ", error);
     }
