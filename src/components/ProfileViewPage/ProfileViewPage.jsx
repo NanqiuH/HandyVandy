@@ -219,20 +219,24 @@ function ProfileViewPage() {
                 <div className={styles.rating}>
                   <span>{starRating}</span> ({reviews.length} reviews)
                 </div>
-                <button className={styles.friendButton}>Send Friend Request</button>
-                <button className={styles.messageButton} onClick={() => navigate(`/chat/${id}`)}>
-                  Send Message
-                </button>
-                <button
-                  className={styles.reviewButton}
-                  onClick={() =>
-                    navigate(`/review/${id}`, {
-                      state: { revieweeId: id, revieweeName: `${profile.firstName} ${profile.lastName}` },
-                    })
-                  }
-                >
-                  Leave a Review
-                </button>
+                {!isOwner && (
+                  <>
+                    <button className={styles.friendButton}>Send Friend Request</button>
+                    <button className={styles.messageButton} onClick={() => navigate(`/chat/${id}`)}>
+                      Send Message
+                    </button>
+                    <button
+                      className={styles.reviewButton}
+                      onClick={() =>
+                        navigate(`/review/${id}`, {
+                          state: { revieweeId: id, revieweeName: `${profile.firstName} ${profile.lastName}` },
+                        })
+                      }
+                    >
+                      Leave a Review
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
