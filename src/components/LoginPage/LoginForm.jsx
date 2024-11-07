@@ -5,10 +5,14 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import MailIcon from '@mui/icons-material/Mail';
 import KeyIcon from '@mui/icons-material/Key';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -25,39 +29,31 @@ function LoginForm() {
 
   return (
     <form className={styles.loginForm}>
-      <div className={styles.inputGroup}>
-        <MailIcon
-          className={styles.inputIcon}
+            <div className={styles.inputGroup}>
+        <MailIcon />
+        <input
+          className={styles.inputField}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
-        <div>
-          <label htmlFor="email" className={styles.inputLabel}>
-            Email
-            <input
-              type="email"
-              id="email"
-              placeholder="example@gmail.com"
-              className={styles.inputField}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-        </div>
       </div>
       <div className={styles.inputGroup}>
-        <KeyIcon
-          className={styles.inputIcon}
+        <KeyIcon />
+        <input
+          className={styles.inputField}
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <div>
-          <label htmlFor="password" className={styles.inputLabel}>
-            Password
-            <input
-              type="password"
-              id="password"
-              placeholder="***********"
-              className={styles.inputField}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-        </div>
+        <IconButton
+          onClick={() => setShowPassword(!showPassword)}
+          edge="end"
+        >
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
       </div>
       <div className={styles.formOptions}>
         <label className={styles.rememberMe}>
