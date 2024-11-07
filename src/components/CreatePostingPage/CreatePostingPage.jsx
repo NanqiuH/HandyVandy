@@ -154,7 +154,6 @@ function CreatePostingPage() {
                     Posting Name
                   </label>
                   <input
-                    type="text"
                     id="postingName"
                     name="postingName"
                     value={formData.postingName}
