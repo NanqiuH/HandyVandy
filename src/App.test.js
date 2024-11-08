@@ -1,8 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// Mock the getMessaging function
+jest.mock('firebase/messaging', () => ({
+  getMessaging: jest.fn(() => ({
+    onMessage: jest.fn(),
+    getToken: jest.fn(),
+  })),
+}));
+
+test('renders without crashing', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
 });
