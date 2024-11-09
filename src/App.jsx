@@ -30,7 +30,7 @@ function App() {
         <Route path='/create-posting' element={<CreatePostingPage />} />
         <Route path='/posting-list' element={<ViewPostingsPage />} />
         <Route path="/posting/:id" element={<SinglePostViewPage />} />
-        <Route path='/search-posting' element={<SearchPostingsPage />} />
+        {/* <Route path='/search-posting' element={<SearchPostingsPage />} /> */}
         <Route path='/category' element={<CategoryPage />} />
         <Route path='/search-post-nearby' element={<SearchPostNearby />} />
       </Routes>
