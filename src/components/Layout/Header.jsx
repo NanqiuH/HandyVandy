@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import styles from './Header.module.css';
 import { Button } from '@mui/material'; 
-import HandyVandyLogo from './HandyVandyLogoNoBkgd.png';
+import HandyVandyLogo from '../../images/UI/HandyVandyLogo.png';
+import HandyVandyLogoText from '../../images/HandyVandyHeaderText.png';
 import createPost from '../../images/UI/CreatePost.png';
 import message from '../../images/UI/message.png';
 import usericon from '../../images/UI/user.png';
@@ -18,6 +19,7 @@ const Header = () => {
     <header className={styles.header}>
       <Button className={styles.logoButton} onClick={() => navigate('/')}>
         <img src={HandyVandyLogo} alt="HandyVandy Logo" className={styles.logoImage} />
+        <img src={HandyVandyLogoText} alt="HandyVandy Logo" className={styles.logoImage} />
       </Button>
       {user ? (
         <nav className={styles.nav}>
