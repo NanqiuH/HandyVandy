@@ -7,7 +7,6 @@ import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 
-// Mock Firebase functions
 jest.mock('firebase/firestore', () => ({
     doc: jest.fn(),
     setDoc: jest.fn(),
@@ -26,6 +25,13 @@ jest.mock('firebase/firestore', () => ({
     db: {},
     storage: {},
   }));
+
+  // Mock the useNavigate function
+  jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useNavigate: jest.fn(),
+  }));
+  
   
   
 
@@ -192,17 +198,11 @@ test('form submission without authentication throws an error', async () => {
     expect(errorMessage).toBeNull();
 });
 
-
 test('form submission with valid data navigates to the correct page', async () => {
-    // Mocking the navigation function
     const mockNavigate = jest.fn();
-    jest.mock('react-router-dom', () => ({
-        ...jest.requireActual('react-router-dom'),
-        useNavigate: () => mockNavigate,
-    }));
+    const { useNavigate } = require('react-router-dom');
+    useNavigate.mockReturnValue(mockNavigate);
   
-    // Mock Firestore and Storage functions
-    setDoc.mockImplementation(() => Promise.resolve({}));
     setDoc.mockResolvedValue({});
     ref.mockReturnValue({});
     uploadBytes.mockResolvedValue({});
@@ -213,7 +213,6 @@ test('form submission with valid data navigates to the correct page', async () =
         <CreateProfilePage />
       </MemoryRouter>
     );
-  
   
     const firstNameInput = screen.getByLabelText(/First Name/i);
     fireEvent.change(firstNameInput, { target: { value: 'John' } });
@@ -229,6 +228,5 @@ test('form submission with valid data navigates to the correct page', async () =
       fireEvent.click(submitButton);
     });
   
-    // Ensure navigate is called with the correct path
     expect(mockNavigate).toHaveBeenCalledWith('/posting-list');
   });
