@@ -82,89 +82,87 @@ function ViewPostingsPage() {
       <main className={styles.postingsPage}>
         <div className={styles.container}>
           <header className={styles.header}>
-            {/* Search bar for searching postings by title */}
-            <input
-              type="text"
-              className={styles.searchBar}
-              placeholder="Search by title..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <div className={styles.filters}>
-              {/* Price filter input */}
-              <label>
-                Price:
-                <input
-                  type="number"
-                  name="price"
-                  value={filters.price}
-                  onChange={handleFilterChange}
-                  placeholder="Max price"
-                />
-              </label>
-              {/* Service Type filter dropdown */}
-              <label>
-                Service Type:
-                <select
-                  name="serviceType"
-                  value={filters.serviceType}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">All</option>
-                  <option value="offering">Offering</option>
-                  <option value="requesting">Requesting</option>
-                </select>
-              </label>
-              {/* Category filter dropdown */}
-              <label>
-                Category:
-                <select
-                  name="category"
-                  value={filters.category}
-                  onChange={handleFilterChange}
-                >
-                  <option value="none">All</option>
-                  <option value="physical labor">Physical Labor</option>
-                  <option value="tutoring">Tutoring</option>
-                  <option value="food">Food</option>
-                  <option value="performance">Performance</option>
-                  <option value="travel">Travel</option>
-                  <option value="technology">Technology</option>
-                  <option value="cleaning">Cleaning</option>
-                  <option value="transportation">Transportation</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="childcare">Childcare</option>
-                  <option value="home improvement">Home Improvement</option>
-                  <option value="pet care">Pet Care</option>
-                  <option value="event planning">Event Planning</option>
-                  <option value="education">Education</option>
-                  <option value="art and design">Art & Design</option>
-                  <option value="fitness">Fitness</option>
-                  <option value="landscaping">Landscaping</option>
-                  <option value="writing">Writing</option>
-                  <option value="music">Music</option>
-                  <option value="photography">Photography</option>
-                  <option value="automotive">Automotive</option>
-                  <option value="other">Other</option>
-                </select>
-              </label>
-              {/* Sort By filter dropdown */}
-              <label>
-                Sort By:
-                <select
-                  name="sortBy"
-                  value={filters.sortBy}
-                  onChange={handleFilterChange}
-                >
-                  <option value="date">Upload Date</option>
-                  <option value="price-low-high">Price (low to high)</option>
-                  <option value="price-high-low">Price (high to low)</option>
-                  <option value="alphabetical">Alphabetically</option>
-                </select>
-              </label>
+            <div className="search-bar">
+              <input
+                type="text"
+                className={styles.searchBar}
+                placeholder="Search by title..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
             </div>
           </header>
-          {/* Display list of postings */}
+          <div>
+              <div className={styles.filters}>
+                <label>
+                  Price:
+                  <input
+                    type="number"
+                    name="price"
+                    value={filters.price}
+                    onChange={handleFilterChange}
+                    placeholder="Max price"
+                  />
+                </label>
+                <label>
+                  Service Type:
+                  <select
+                    name="serviceType"
+                    value={filters.serviceType}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All</option>
+                    <option value="offering">Offering</option>
+                    <option value="requesting">Requesting</option>
+                  </select>
+                </label>
+                <label>
+                  Category:
+                  <select
+                    name="category"
+                    value={filters.category}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="none">All</option>
+                    <option value="physical labor">Physical Labor</option>
+                    <option value="tutoring">Tutoring</option>
+                    <option value="food">Food</option>
+                    <option value="performance">Performance</option>
+                    <option value="travel">Travel</option>
+                    <option value="technology">Technology</option>
+                    <option value="cleaning">Cleaning</option>
+                    <option value="transportation">Transportation</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="childcare">Childcare</option>
+                    <option value="home improvement">Home Improvement</option>
+                    <option value="pet care">Pet Care</option>
+                    <option value="event planning">Event Planning</option>
+                    <option value="education">Education</option>
+                    <option value="art and design">Art & Design</option>
+                    <option value="fitness">Fitness</option>
+                    <option value="landscaping">Landscaping</option>
+                    <option value="writing">Writing</option>
+                    <option value="music">Music</option>
+                    <option value="photography">Photography</option>
+                    <option value="automotive">Automotive</option>
+                    <option value="other">Other</option>
+                  </select>
+                </label>
+                <label>
+                  Sort By:
+                  <select
+                    name="sortBy"
+                    value={filters.sortBy}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="date">Upload Date</option>
+                    <option value="price-low-high">Price (low to high)</option>
+                    <option value="price-high-low">Price (high to low)</option>
+                    <option value="alphabetical">Alphabetically</option>
+                  </select>
+                </label>
+              </div>
+            </div>
           <div className={styles.postingsList}>
             {sortedPostings.length === 0 ? (
               <p>No postings available.</p>

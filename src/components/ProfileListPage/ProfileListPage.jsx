@@ -47,13 +47,15 @@ function ProfileListPage() {
           <header className={styles.header}>
             <h1 className={styles.title}>Profiles</h1>
           </header>
-          <input
-            type="text"
-            placeholder="Search profiles..."
-            className={styles.searchBar}
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
+          <div className="">
+            <input
+              type="text"
+              placeholder="Search profiles..."
+              className={styles.searchBar}
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
           <div className={styles.profileList}>
             {filteredProfiles.length === 0 ? (
               <p>No profiles available.</p>

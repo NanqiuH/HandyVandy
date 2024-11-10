@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f4f6f8;
+  background-color: #D9D1CF;
   padding: 20px;
 }
 
@@ -87,8 +87,11 @@
   max-width: 600px; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   transition: border-color 0.3s; 
-  margin-top: 10px; 
-  margin-bottom: 30px;
+  margin-top: 3rem; 
+  margin-bottom: 3rem;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .searchBar:focus {

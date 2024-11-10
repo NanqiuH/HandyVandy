@@ -70,6 +70,11 @@
   padding: 10px;
 }
 
+.chatPageContainer{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 .message {
   max-width: 60%;
   word-wrap: break-word;
