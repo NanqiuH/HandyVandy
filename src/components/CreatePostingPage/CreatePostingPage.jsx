@@ -5,6 +5,8 @@ import Header from "../Layout/Header";
 import { db, auth, storage } from "../../firebase"; // Import Firebase Firestore, Auth, and Storage
 import { collection, addDoc } from "firebase/firestore"; // Firestore functions to add documents
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase storage functions to handle image upload
+import CategoryOptions from "../../options/CategoryOptions";
+import ServiceTypeOptions from "../../options/ServiceOptions";
 
 function CreatePostingPage() {
   // State to manage form data
@@ -229,10 +231,7 @@ function CreatePostingPage() {
                       className={`${styles.select} ${serviceTypeError ? styles.errorInput : ""}`}
                     >
                       <option value="none">None</option>
-                      <option value="offering">Offering</option>
-                      <option value="requesting">Requesting</option>
-                      <option value="offering-with-delivery">Offering with Delivery</option>
-                      <option value="requesting-with-delivery">Requesting with Delivery</option>
+                      <ServiceTypeOptions />
                     </select>
                     {serviceTypeError && (
                       <span className={styles.errorMessage}>
@@ -253,29 +252,7 @@ function CreatePostingPage() {
                       onChange={handleCategoryChange}
                       className={`${styles.select} ${categoryError ? styles.errorInput : ""}`}
                     >
-                      <option value="none">None</option>
-                      <option value="physical labor">Physical Labor</option>
-                      <option value="tutoring">Tutoring</option>
-                      <option value="food">Food</option>
-                      <option value="performance">Performance</option>
-                      <option value="travel">Travel</option>
-                      <option value="technology">Technology</option>
-                      <option value="cleaning">Cleaning</option>
-                      <option value="transportation">Transportation</option>
-                      <option value="healthcare">Healthcare</option>
-                      <option value="childcare">Childcare</option>
-                      <option value="home improvement">Home Improvement</option>
-                      <option value="pet care">Pet Care</option>
-                      <option value="event planning">Event Planning</option>
-                      <option value="education">Education</option>
-                      <option value="art and design">Art & Design</option>
-                      <option value="fitness">Fitness</option>
-                      <option value="landscaping">Landscaping</option>
-                      <option value="writing">Writing</option>
-                      <option value="music">Music</option>
-                      <option value="photography">Photography</option>
-                      <option value="automotive">Automotive</option>
-                      <option value="other">Other</option>
+                    <CategoryOptions />
                     </select>
                     {categoryError && (
                       <span className={styles.errorMessage}>

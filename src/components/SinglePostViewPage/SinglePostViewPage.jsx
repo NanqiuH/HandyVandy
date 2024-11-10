@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Header from "../Layout/Header";
 import styles from "./SinglePostViewPage.module.css";
 import HandyVandyLogo from "../../images/HandyVandyV.png";
+import ServiceOptions from "../../options/ServiceOptions";
 
 function SinglePostingPage() {
   const { id } = useParams();
@@ -248,8 +249,7 @@ function SinglePostingPage() {
                         onChange={handleInputChange}
                         className={styles.select}
                       >
-                        <option value="offering">Offering</option>
-                        <option value="requesting">Requesting</option>
+                        <ServiceOptions />
                       </select>
                     </div>
 

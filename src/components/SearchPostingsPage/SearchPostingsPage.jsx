@@ -5,6 +5,7 @@ import { auth } from "../../firebase";
 import Fuse from "fuse.js";
 import styles from "./SearchPostingsPage.module.css";
 import Header from "../Layout/Header";
+import ServiceOptions from "../../options/ServiceOptions";
 
 const PAGE_SIZE = 10;
 
@@ -163,8 +164,7 @@ function SearchPostingsPage() {
                       className={styles.select}
                     >
                       <option value="all">All</option>
-                      <option value="offering">Offering</option>
-                      <option value="requesting">Requesting</option>
+                      <ServiceOptions />
                     </select>
                   </div>
                   <button type="submit" className={styles.submitButton}>
