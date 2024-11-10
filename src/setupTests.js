@@ -5,7 +5,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getMessaging } from 'firebase/messaging';
 import { getStorage } from 'firebase/storage';
-import '@testing-library/jest-dom'; // Add this line for Jest DOM matchers
+import '@testing-library/jest-dom';
 
 // Mock each Firebase function that initializes services in your app
 jest.mock('firebase/auth', () => ({
