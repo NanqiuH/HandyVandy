@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CreateProfilePage from './CreateProfilePage';
 import { act } from 'react';
+import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -17,11 +18,13 @@ jest.mock('firebase/firestore', () => ({
     getDownloadURL: jest.fn(),
   }));
   
-jest.mock('../../firebase', () => ({
+  jest.mock('../../firebase', () => ({
     auth: {
       currentUser: { uid: 'test-uid' },
     },
-}));
+    db: {},
+    storage: {},
+  }));
 
   // Mock the useNavigate function
   jest.mock('react-router-dom', () => ({
