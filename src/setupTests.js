@@ -1,27 +1,31 @@
 import { TextEncoder, TextDecoder } from 'util';
 import { ReadableStream } from 'stream/web';
 import dotenv from 'dotenv';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getMessaging } from 'firebase/messaging';
-import { getStorage } from 'firebase/storage';
 import '@testing-library/jest-dom';
 
-// Mock each Firebase function that initializes services in your app
+// Mock Firebase services
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
+  auth: {
+    currentUser: { uid: 'test-uid' },
+  },
 }));
 
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
+  db: jest.fn(),
 }));
 
 jest.mock('firebase/messaging', () => ({
-  getMessaging: jest.fn(),
+  getMessaging: jest.fn(() => ({
+    onMessage: jest.fn(),
+    getToken: jest.fn(),
+  })),
 }));
 
 jest.mock('firebase/storage', () => ({
   getStorage: jest.fn(),
+  storage: jest.fn(),
 }));
 
 // Mock the useAuth function to return a default value
@@ -35,6 +39,7 @@ jest.mock('./context/AuthContext', () => ({
 
 dotenv.config({ path: '.env.local' });
 
+// Mock global objects needed for some tests
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 global.ReadableStream = ReadableStream;

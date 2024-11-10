@@ -37,12 +37,17 @@ function CreateProfilePage() {
   };
 
   const handleSubmit = async (e) => {
+    console.log('4NAVIGATION')
     e.preventDefault();
     try {
+      console.log('5NAVIGATION')
       const user = auth.currentUser;
+      console.log('6NAVIGATION')
+
       if (!user) {
         throw new Error("User not authenticated");
       }
+      console.log('3NAVIGATION')
 
       let profileImageUrl = null;
       if (formData.profileImage) {
@@ -50,8 +55,11 @@ function CreateProfilePage() {
         await uploadBytes(storageRef, formData.profileImage);
         profileImageUrl = await getDownloadURL(storageRef);
       }
+      console.log('2NAVIGATION')
 
       const profileDocRef = doc(db, "profiles", user.uid);
+      console.log('21NAVIGATION')
+
       await setDoc(profileDocRef, {
         firstName: formData.firstName,
         middleName: formData.middleName,
@@ -61,8 +69,10 @@ function CreateProfilePage() {
         rating: formData.rating,
         numRatings: formData.numRatings,
       });
-
+      console.log('1NAVIGATION')
       navigate("/posting-list");
+      console.log('0NAVIGATION')
+
     } catch (error) {
       console.error("Error adding document: ", error);
     }

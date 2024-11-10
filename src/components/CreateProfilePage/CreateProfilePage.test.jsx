@@ -1,16 +1,33 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CreateProfilePage from './CreateProfilePage';
-import { auth } from '../../firebase';
 import { act } from 'react';
+import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
+import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-jest.mock('../../firebase', () => ({
+
+// Mock Firebase functions
+jest.mock('firebase/firestore', () => ({
+    doc: jest.fn(),
+    setDoc: jest.fn(),
+  }));
+  
+  jest.mock('firebase/storage', () => ({
+    ref: jest.fn(),
+    uploadBytes: jest.fn(),
+    getDownloadURL: jest.fn(),
+  }));
+  
+  jest.mock('../../firebase', () => ({
     auth: {
-        currentUser: { uid: 'test-uid' },
+      currentUser: { uid: 'test-uid' },
     },
-    db: jest.fn(),
-    storage: jest.fn(),
-}));
+    db: {},
+    storage: {},
+  }));
+  
+  
 
 test('renders the Create Your Profile heading', () => {
     render(
@@ -175,33 +192,43 @@ test('form submission without authentication throws an error', async () => {
     expect(errorMessage).toBeNull();
 });
 
+
 test('form submission with valid data navigates to the correct page', async () => {
-    auth.currentUser = { uid: 'test-uid' };
+    // Mocking the navigation function
     const mockNavigate = jest.fn();
     jest.mock('react-router-dom', () => ({
         ...jest.requireActual('react-router-dom'),
         useNavigate: () => mockNavigate,
     }));
-
+  
+    // Mock Firestore and Storage functions
+    setDoc.mockImplementation(() => Promise.resolve({}));
+    setDoc.mockResolvedValue({});
+    ref.mockReturnValue({});
+    uploadBytes.mockResolvedValue({});
+    getDownloadURL.mockResolvedValue('http://example.com/profile.jpg');
+  
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
-        </MemoryRouter>
+      <MemoryRouter>
+        <CreateProfilePage />
+      </MemoryRouter>
     );
-
+  
+  
     const firstNameInput = screen.getByLabelText(/First Name/i);
     fireEvent.change(firstNameInput, { target: { value: 'John' } });
-
+  
     const lastNameInput = screen.getByLabelText(/Last Name/i);
     fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
-
+  
     const bioTextarea = screen.getByLabelText(/Bio/i);
     fireEvent.change(bioTextarea, { target: { value: 'This is a bio' } });
-
+  
     const submitButton = screen.getByRole('button', { name: /Create Profile/i });
     await act(async () => {
-        fireEvent.click(submitButton);
+      fireEvent.click(submitButton);
     });
-    
+  
+    // Ensure navigate is called with the correct path
     expect(mockNavigate).toHaveBeenCalledWith('/posting-list');
-});
+  });
