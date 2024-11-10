@@ -114,6 +114,8 @@ function ViewPostingsPage() {
                     <option value="">All</option>
                     <option value="offering">Offering</option>
                     <option value="requesting">Requesting</option>
+                    <option value="offering-with-delivery">Offering with Delivery</option>
+                    <option value="requesting-with-delivery">Requesting with Delivery</option>
                   </select>
                 </label>
                 <label>
@@ -174,8 +176,10 @@ function ViewPostingsPage() {
                   serviceTypeClass = styles.offeringStyle;
                 } else if (posting.serviceType === "requesting") {
                   serviceTypeClass = styles.requestingStyle;
-                } else if (posting.serviceType === "all") {
-                  serviceTypeClass = styles.allStyle;
+                } else if (posting.serviceType === "requesting-with-delivery") {
+                  serviceTypeClass = styles.request_delivery;
+                } else if (posting.serviceType === "offering-with-delivery") {
+                  serviceTypeClass = styles.offer_delivery;
                 }
                 return (
                   <Link
@@ -198,9 +202,12 @@ function ViewPostingsPage() {
                         </p>
                         <p className={styles.postingPrice}>Price: ${posting.price}</p>
                         <p className={styles.postingType}>
-                          {posting.serviceType === "offering"
-                            ? "Offering"
-                            : "Requesting"}
+                          {
+                            posting.serviceType === "offering" ? "Offering" :
+                            posting.serviceType === "requesting" ? "Requesting" :
+                            posting.serviceType === "offering-with-delivery" ? "Offering with Delivery" :
+                            posting.serviceType === "requesting-with-delivery" ? "Requesting with Delivery" : ""
+                          }
                         </p>
                       </div>
                     </div>

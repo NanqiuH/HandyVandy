@@ -169,15 +169,23 @@ label {
 
 .offeringStyle {
   /* Styles for offering service type */
-  background-color: #e0ffe0;
+  background-color: #decfe3;
 }
 
 .requestingStyle {
   /* Styles for requesting service type */
-  background-color: #ffe0e0;
+  background-color: #d9ede7;
 }
 
 .allStyle {
   /* Styles for all service type */
   background-color: #e0e0ff;
 }
+.offer_delivery{
+  background-color: #c3a4a9c8;
+}
+
+.request_delivery{
+  background-color: #bfd1df;
+}
+

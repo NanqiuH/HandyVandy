@@ -67,6 +67,8 @@ function CreatePostingPage() {
     setCategoryError(false);
   };
 
+  console.log(formData);
+
   // Form submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -229,6 +231,8 @@ function CreatePostingPage() {
                       <option value="none">None</option>
                       <option value="offering">Offering</option>
                       <option value="requesting">Requesting</option>
+                      <option value="offering-with-delivery">Offering with Delivery</option>
+                      <option value="requesting-with-delivery">Requesting with Delivery</option>
                     </select>
                     {serviceTypeError && (
                       <span className={styles.errorMessage}>
