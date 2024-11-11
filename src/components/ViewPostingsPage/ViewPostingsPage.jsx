@@ -15,7 +15,7 @@ function ViewPostingsPage() {
   const [filters, setFilters] = useState({
     price: '', // Filter by maximum price
     serviceType: '', // Filter by service type (offering/requesting)
-    category: 'none', // Default category filter
+    category: 'None', // Default category filter
     sortBy: 'date', // Default sorting by upload date
   });
   // State to manage search term for searching postings by title
@@ -58,7 +58,7 @@ function ViewPostingsPage() {
   const filteredPostings = postings.filter((posting) => {
     const matchesPrice = filters.price ? parseFloat(posting.price) <= parseFloat(filters.price) : true;
     const matchesServiceType = filters.serviceType ? posting.serviceType === filters.serviceType : true;
-    const matchesCategory = filters.category !== 'none' ? posting.category === filters.category : true;
+    const matchesCategory = filters.category !== 'None' ? posting.category === filters.category : true;
     const matchesSearchTerm = posting.postingName.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesPrice && matchesServiceType && matchesCategory && matchesSearchTerm;
   });
