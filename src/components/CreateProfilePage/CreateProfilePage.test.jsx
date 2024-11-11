@@ -1,10 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CreateProfilePage from './CreateProfilePage';
-import { act } from 'react';
-import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
-import { doc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
 import userEvent from '@testing-library/user-event';
 
 const mockUser = {

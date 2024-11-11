@@ -1,11 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CreatePostingPage from './CreatePostingPage';
-import { act } from 'react';
-import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
-import { doc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useNavigate } from 'react-router-dom';
+import { auth } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
 import userEvent from '@testing-library/user-event';
 
 
@@ -41,6 +37,10 @@ jest.mock('firebase/firestore', () => ({
     ...jest.requireActual('react-router-dom'),
     useNavigate: () => mockedUsedNavigate,
 }));
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
   
 
