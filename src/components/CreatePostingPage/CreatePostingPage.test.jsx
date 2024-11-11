@@ -6,6 +6,8 @@ import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the moc
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
+
 
 const mockUser = {
     uid: 'test-uid',
@@ -316,9 +318,7 @@ test('contains correct options in category dropdown', () => {
         </MemoryRouter>
     );
     const submitButton = screen.getByRole('button', { name: /Create Posting/i });
-    await act(async () => {
-        fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
     expect(auth.currentUser).toBeTruthy();
 });
 
@@ -330,9 +330,7 @@ test('form submission without authentication throws an error', async () => {
       </MemoryRouter>
     );
     const submitButton = screen.getByRole('button', { name: /Create Posting/i });
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
     const errorMessage = screen.queryByText(/User not authenticated/i);
       expect(errorMessage).toBeNull();
   });
@@ -361,9 +359,7 @@ test('form submission without authentication throws an error', async () => {
   
     const submitButton = screen.getByRole('button', { name: /Create Posting/i });
 
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
 
     expect(mockedUsedNavigate).toHaveBeenCalledWith('/posting-list');
     mockedUsedNavigate.mockRestore();
@@ -389,9 +385,7 @@ test('form submission without authentication throws an error', async () => {
     fireEvent.change(dropdownCategory, { target: { value: 'physical labor' } });
   
     const submitButton = screen.getByRole('button', { name: /Create Posting/i });
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
   
     expect(screen.getByText('Please select a valid service type.')).toBeInTheDocument();
   });
@@ -416,9 +410,7 @@ test('form submission without authentication throws an error', async () => {
     fireEvent.change(dropdownServiceType, { target: { value: 'Requesting' } });
   
     const submitButton = screen.getByRole('button', { name: /Create Posting/i });
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
   
     expect(screen.getByText('Please select a valid category.')).toBeInTheDocument();
   });

@@ -5,6 +5,7 @@ import { act } from 'react';
 import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import userEvent from '@testing-library/user-event';
 
 const mockUser = {
     uid: 'test-uid',
@@ -171,9 +172,7 @@ test('form submission calls handleSubmit', async () => {
         </MemoryRouter>
     );
     const submitButton = screen.getByRole('button', { name: /Create Profile/i });
-    await act(async () => {
-        fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
     expect(auth.currentUser).toBeTruthy();
 });
 
@@ -185,9 +184,7 @@ test('form submission without authentication throws an error', async () => {
     </MemoryRouter>
   );
   const submitButton = screen.getByRole('button', { name: /Create Profile/i });
-  await act(async () => {
-    fireEvent.click(submitButton);
-  });
+  await userEvent.click(submitButton);
   const errorMessage = screen.queryByText(/User not authenticated/i);
     expect(errorMessage).toBeNull();
 });
@@ -209,9 +206,7 @@ test('form submission with valid data navigates to the correct page', async () =
     fireEvent.change(bioTextarea, { target: { value: 'This is a bio' } });
   
     const submitButton = screen.getByRole('button', { name: /Create Profile/i });
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
   
     expect(mockedUsedNavigate).toHaveBeenCalledWith('/posting-list');
     mockedUsedNavigate.mockRestore();
