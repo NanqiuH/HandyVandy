@@ -11,7 +11,7 @@ import ReviewPage from './components/ReviewPage/ReviewPage';
 import CreatePostingPage from './components/CreatePostingPage/CreatePostingPage';
 import ViewPostingsPage from './components/ViewPostingsPage/ViewPostingsPage';
 import SinglePostViewPage from './components/SinglePostViewPage/SinglePostViewPage';
-import SearchPostNearby from './maps/SearchPostNearby';
+import SearchPostNearby from './components/maps/SearchPostNearby';
 
 function App() {
   return (

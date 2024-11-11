@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db, auth } from '../firebase'; 
+import { db, auth } from '../../firebase'; 
 import { onAuthStateChanged } from "firebase/auth";
 import styles from './SearchPostNearby.module.css';
 import Button from '@mui/material/Button';
-import Header from '../components/Layout/Header';
+import Header from '../Layout/Header';
 import userMarker from './userMarkerIcon.png'
 
 const SearchPostNearby = () => {
