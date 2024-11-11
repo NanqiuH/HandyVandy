@@ -176,3 +176,132 @@ test('Category input field has the correct initial value', () => {
     const categoryInput = screen.getByLabelText(/Category/i);
     expect(categoryInput.value).toBe("None");
 });
+
+test('Upload an Image input allows file selection', () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const profileImageInput = screen.getByLabelText(/Upload an Image/i);
+    const file = new File(['dummy content'], 'example.png', { type: 'image/png' });
+    fireEvent.change(profileImageInput, { target: { files: [file] } });
+    expect(profileImageInput.files[0]).toBe(file);
+});
+
+test('handles input change for Posting Name', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser} />
+      </MemoryRouter>
+    );
+    const postingNameInput = screen.getByLabelText(/posting name/i);
+    fireEvent.change(postingNameInput, { target: { value: 'New Posting Name' } });
+    expect(postingNameInput.value).toBe('New Posting Name');
+});
+
+test('handles input change for Description', () => {
+  render(
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <CreatePostingPage user={mockUser} />
+    </MemoryRouter>
+  );
+  const descriptionInput = screen.getByLabelText(/description/i);
+  fireEvent.change(descriptionInput, { target: { value: 'New Description' } });
+  expect(descriptionInput.value).toBe('New Description');
+});
+
+test('handles input change for Price', () => {
+  render(
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <CreatePostingPage user={mockUser} />
+    </MemoryRouter>
+  );
+  const priceInput = screen.getByLabelText(/price/i);
+  fireEvent.change(priceInput, { target: { value: '100' } });
+  expect(priceInput.value).toBe('100');
+});
+
+test('contains correct options in service type dropdown', () => {
+  render(
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <CreatePostingPage user={mockUser} />
+    </MemoryRouter>
+  );
+  const dropdown = screen.getByLabelText('Service Type');
+  expect(dropdown).toHaveTextContent('Offering');
+  expect(dropdown).toHaveTextContent('Requesting');
+  expect(dropdown).toHaveTextContent('Offering with Delivery');
+  expect(dropdown).toHaveTextContent('Requesting with Delivery');
+});
+
+test('allows user to select an option from service type dropdown', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser} />
+      </MemoryRouter>
+    );
+    const dropdown = screen.getByLabelText('Service Type');
+  
+    // Simulate user selecting "Offering"
+    fireEvent.change(dropdown, { target: { value: 'Offering' } });
+    const selectedOption = screen.getByDisplayValue('Offering');
+    expect(selectedOption).toBeInTheDocument();
+    
+    // Simulate user selecting "Requesting"
+    fireEvent.change(dropdown, { target: { value: 'Requesting' } });
+    const selectedOptionTutoring = screen.getByDisplayValue('Requesting');
+    expect(selectedOptionTutoring).toBeInTheDocument();
+  });
+
+test('contains correct options in category dropdown', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser} />
+      </MemoryRouter>
+    );
+    const dropdown = screen.getByLabelText('Category');
+    expect(dropdown).toHaveTextContent('None');
+    expect(dropdown).toHaveTextContent('Physical Labor');
+    expect(dropdown).toHaveTextContent('Tutoring');
+    expect(dropdown).toHaveTextContent('Food');
+    expect(dropdown).toHaveTextContent('Performance');
+    expect(dropdown).toHaveTextContent('Travel');
+    expect(dropdown).toHaveTextContent('Technology');
+    expect(dropdown).toHaveTextContent('Cleaning');
+    expect(dropdown).toHaveTextContent('Transportation');
+    expect(dropdown).toHaveTextContent('Healthcare');
+    expect(dropdown).toHaveTextContent('Childcare');
+    expect(dropdown).toHaveTextContent('Home Improvement');
+    expect(dropdown).toHaveTextContent('Pet Care');
+    expect(dropdown).toHaveTextContent('Event Planning');
+    expect(dropdown).toHaveTextContent('Education');
+    expect(dropdown).toHaveTextContent('Art & Design');
+    expect(dropdown).toHaveTextContent('Fitness');
+    expect(dropdown).toHaveTextContent('Landscaping');
+    expect(dropdown).toHaveTextContent('Writing');
+    expect(dropdown).toHaveTextContent('Music');
+    expect(dropdown).toHaveTextContent('Photography');
+    expect(dropdown).toHaveTextContent('Automotive');
+    expect(dropdown).toHaveTextContent('Other');
+  });
+
+  test('allows user to select an option from category dropdown', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser} />
+      </MemoryRouter>
+    );
+    const dropdown = screen.getByLabelText('Category');
+  
+  
+    // Simulate user selecting "Physical Labor"
+    fireEvent.change(dropdown, { target: { value: 'physical labor' } });
+    const selectedOption = screen.getByDisplayValue('Physical Labor');
+    expect(selectedOption).toBeInTheDocument();
+    
+    // Simulate user selecting "Tutoring"
+    fireEvent.change(dropdown, { target: { value: 'tutoring' } });
+    const selectedOptionTutoring = screen.getByDisplayValue('Tutoring');
+    expect(selectedOptionTutoring).toBeInTheDocument();
+  });
