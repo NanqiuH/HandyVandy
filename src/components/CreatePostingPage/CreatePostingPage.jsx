@@ -69,8 +69,6 @@ function CreatePostingPage() {
     setCategoryError(false);
   };
 
-  console.log(formData);
-
   // Form submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
