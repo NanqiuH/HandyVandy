@@ -48,7 +48,12 @@ const SearchPostNearby = () => {
         const locationName = await getLocationName(lat, lng);
         setShowDialog(true);
         setDialogLocation({ lat, lng });
-        setSelectedLocation({ lat, lng, name: locationName, userId: user.uid });
+        if (user && user.uid) {
+          setSelectedLocation({ lat, lng, name: locationName, userId: user.uid });
+        } else {
+          console.error("User is not defined or user.uid is not available");
+          alert("User information is not available. Please log in.");
+        }
       } catch (error) {
         console.error("Error getting location name:", error);
         alert("Failed to get location name. Please try again.");
