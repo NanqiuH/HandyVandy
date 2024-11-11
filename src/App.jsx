@@ -11,8 +11,6 @@ import ReviewPage from './components/ReviewPage/ReviewPage';
 import CreatePostingPage from './components/CreatePostingPage/CreatePostingPage';
 import ViewPostingsPage from './components/ViewPostingsPage/ViewPostingsPage';
 import SinglePostViewPage from './components/SinglePostViewPage/SinglePostViewPage';
-import SearchPostingsPage from './components/SearchPostingsPage/SearchPostingsPage';
-import CategoryPage from './components/CategoryPage/CategoryPage';
 import SearchPostNearby from './maps/SearchPostNearby';
 
 function App() {
@@ -30,8 +28,6 @@ function App() {
         <Route path='/create-posting' element={<CreatePostingPage />} />
         <Route path='/posting-list' element={<ViewPostingsPage />} />
         <Route path="/posting/:id" element={<SinglePostViewPage />} />
-        {/* <Route path='/search-posting' element={<SearchPostingsPage />} /> */}
-        <Route path='/category' element={<CategoryPage />} />
         <Route path='/search-post-nearby' element={<SearchPostNearby />} />
       </Routes>
     </BrowserRouter>
