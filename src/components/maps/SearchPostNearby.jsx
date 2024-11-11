@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db, auth } from '../../firebase'; 
-import { onAuthStateChanged } from "firebase/auth";
 import styles from './SearchPostNearby.module.css';
 import Button from '@mui/material/Button';
 import Header from '../Layout/Header';
-import userMarker from './userMarkerIcon.png'
+import userMarker from '../../images/userMarkerIcon.png';
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
@@ -21,9 +20,7 @@ const SearchPostNearby = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
+    setUser(auth.currentUser);
     fetchLocations();
   }, []);
 

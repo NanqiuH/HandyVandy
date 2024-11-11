@@ -1,3 +1,5 @@
+import { onAuthStateChanged } from "firebase/auth";
+
 // Mocking Firebase functions used in the component
 export const getAuth = jest.fn();
 export const getFirestore = jest.fn();
@@ -10,6 +12,7 @@ export const getStorage = jest.fn();
 // Mocking the Firebase Auth module
 export const auth = {
   currentUser: { uid: 'test-uid' }, // Simulating a logged-in user
+  onAuthStateChanged: jest.fn(), // Mocking the onAuthStateChanged method
 };
 
 // Mocking Firestore
