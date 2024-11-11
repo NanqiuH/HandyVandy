@@ -166,3 +166,13 @@ test('Service Type input field has the correct initial value', () => {
     const serviceTypeInput = screen.getByLabelText(/Service Type/i);
     expect(serviceTypeInput.value).toBe('None');
 });
+
+test('Category input field has the correct initial value', () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const categoryInput = screen.getByLabelText(/Category/i);
+    expect(categoryInput.value).toBe("None");
+});

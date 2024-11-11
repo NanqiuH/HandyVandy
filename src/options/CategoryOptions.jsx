@@ -2,7 +2,7 @@
 function CategoryOptions() {
   return (
     <>
-        <option value="none">None</option>
+        <option value="None">None</option>
         <option value="physical labor">Physical Labor</option>
         <option value="tutoring">Tutoring</option>
         <option value="food">Food</option>
