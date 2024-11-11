@@ -2,12 +2,15 @@ import LoginPage from "./LoginPage";
 import LoginForm from "./LoginForm";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { auth } from "../../__mocks__/firebase"; // Imports the mock functions (see __mock__/firebase.js)
-import userEvent from "@testing-library/user-event";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const mockUser = {
   uid: "test-uid",
 };
+
+jest.mock('firebase/auth', () => ({
+    signInWithEmailAndPassword: jest.fn(),
+  }));
 
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
@@ -25,6 +28,7 @@ jest.mock("firebase/storage", () => ({
 jest.mock("../../firebase", () => ({
   auth: {
     currentUser: { uid: "test-uid" },
+    signInWithEmailAndPassword: jest.fn()
   },
   db: {},
   storage: {},
@@ -37,6 +41,10 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockedUsedNavigate,
 }));
+
+beforeEach (() => {
+    jest.clearAllMocks();
+});
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -197,3 +205,67 @@ test("renders the remaining message", () => {
 
   expect(input).toBeInTheDocument();
 });
+
+test("successful login", async () => {
+    signInWithEmailAndPassword.mockResolvedValueOnce({
+      user: { uid: "test-uid" },
+    });
+  
+    render(
+      <MemoryRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <LoginForm />
+      </MemoryRouter>
+    );
+  
+    const emailInput = screen.getByPlaceholderText(/Email/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const loginButton = screen.getByRole("button", { name: /Login/i });
+  
+    fireEvent.change(emailInput, { target: { value: "test@gmail.com" } });
+    fireEvent.change(passwordInput, { target: { value: "123456" } });
+    fireEvent.click(loginButton);
+  
+    await waitFor(() => 
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        "test@gmail.com",
+        "123456"
+      )
+    );
+
+    await waitFor(() => 
+      expect(mockedUsedNavigate).toHaveBeenCalledWith("/posting-list")
+    );
+  });
+
+  test("unsuccessful login", async () => {
+      jest.spyOn(window, 'alert').mockImplementation(() => {});
+    signInWithEmailAndPassword.mockRejectedValueOnce(new Error("Invalid credentials"));
+  
+    render(
+        <MemoryRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <LoginForm />
+      </MemoryRouter>
+    );
+  
+    const emailInput = screen.getByPlaceholderText(/Email/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const loginButton = screen.getByRole("button", { name: /Login/i });
+  
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    fireEvent.change(passwordInput, { target: { value: "wrongpassword" } });
+    fireEvent.click(loginButton);
+  
+    await waitFor(() => 
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        "test@example.com",
+        "wrongpassword"
+      )
+    );
+    expect(window.alert).toHaveBeenCalledWith("Login failed. Please check your email and password.");
+  });

@@ -19,10 +19,10 @@ function LoginForm() {
       e.preventDefault();
       try {
           await signInWithEmailAndPassword(auth, email, password);
-          console.log('Login successfully');
+          // console.log('Login successfully');
           navigate('/posting-list');
       } catch (error) {
-          console.error(error);
+          // console.error(error);
           alert('Login failed. Please check your email and password.');
       }
   }
