@@ -240,3 +240,22 @@ test("form submission with valid data navigates to the correct page", async () =
   expect(mockedUsedNavigate).toHaveBeenCalledWith("/posting-list");
   mockedUsedNavigate.mockRestore();
 });
+
+test("first name and last name fields are marked as required", () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <CreateProfilePage user={mockUser} />
+    </MemoryRouter>
+  );
+
+  const firstNameInput = screen.getByLabelText(/First Name/i);
+  const lastNameInput = screen.getByLabelText(/Last Name/i);
+  const bioInput = screen.getByLabelText(/Bio/i);
+
+
+  expect(firstNameInput).toBeRequired();
+  expect(lastNameInput).toBeRequired();
+  expect(bioInput).toBeRequired();
+});
