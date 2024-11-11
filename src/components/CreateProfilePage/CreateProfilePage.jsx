@@ -38,12 +38,6 @@ function CreateProfilePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Basic client-side validation
-    if (!formData.firstName || !formData.lastName || !formData.bio) {
-      console.warn("Required fields are missing");
-      return; // Prevent form submission if any required field is empty
-    }
     try {
       const user = auth.currentUser;
 
