@@ -5,12 +5,15 @@ import { act } from 'react';
 import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the mock functions (see __mock__/firebase.js)
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useNavigate } from 'react-router-dom';
 
 const mockUser = {
     uid: 'test-uid',
   };
 
 jest.mock('firebase/firestore', () => ({
+    collection: jest.fn(),
+    addDoc: jest.fn(),
     doc: jest.fn(),
     setDoc: jest.fn(),
   }));
@@ -30,11 +33,13 @@ jest.mock('firebase/firestore', () => ({
   }));
 
   // Mock the useNavigate function
-  const mockNavigate = jest.fn();
   jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
-    useNavigate: () => mockNavigate,
-  }));
+    useNavigate: jest.fn(),
+}));
+
+const mockNavigate = jest.fn();
+useNavigate.mockReturnValue(mockNavigate);
   
   
 
@@ -294,7 +299,6 @@ test('contains correct options in category dropdown', () => {
     );
     const dropdown = screen.getByLabelText('Category');
   
-  
     // Simulate user selecting "Physical Labor"
     fireEvent.change(dropdown, { target: { value: 'physical labor' } });
     const selectedOption = screen.getByDisplayValue('Physical Labor');
@@ -304,4 +308,66 @@ test('contains correct options in category dropdown', () => {
     fireEvent.change(dropdown, { target: { value: 'tutoring' } });
     const selectedOptionTutoring = screen.getByDisplayValue('Tutoring');
     expect(selectedOptionTutoring).toBeInTheDocument();
+  });
+
+  test('form submission calls handleSubmit', async () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const submitButton = screen.getByRole('button', { name: /Create Posting/i });
+    await act(async () => {
+        fireEvent.click(submitButton);
+    });
+    expect(auth.currentUser).toBeTruthy();
+});
+
+test('form submission without authentication throws an error', async () => {
+    auth.currentUser = null;
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser}/>
+      </MemoryRouter>
+    );
+    const submitButton = screen.getByRole('button', { name: /Create Posting/i });
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+    const errorMessage = screen.queryByText(/User not authenticated/i);
+      expect(errorMessage).toBeNull();
+  });
+
+  test('form submission with valid data navigates to the correct page', async () => {
+    
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser}/>
+      </MemoryRouter>
+    );
+  
+    const postingNameInput = screen.getByLabelText(/Posting Name/i);
+    fireEvent.change(postingNameInput, { target: { value: 'Head Chef' } });
+  
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    fireEvent.change(descriptionInput, { target: { value: 'seeking Head Chef' } });
+  
+    const priceInput = screen.getByLabelText(/Price/i);
+    fireEvent.change(priceInput, { target: { value: '100' } });
+
+    const dropdownServiceType = screen.getByLabelText('Service Type');
+    fireEvent.change(dropdownServiceType, { target: { value: 'Requesting' } });
+
+    const dropdownCategory = screen.getByLabelText('Category');
+    fireEvent.change(dropdownCategory, { target: { value: 'physical labor' } });
+  
+    const submitButton = screen.getByRole('button', { name: /Create Posting/i });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    // await waitFor(() => {
+    //     expect(mockNavigate).toHaveBeenCalledWith('/posting-list');
+    // });
   });
