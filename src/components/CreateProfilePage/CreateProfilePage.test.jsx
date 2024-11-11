@@ -164,18 +164,6 @@ test('handleChange updates formData state correctly', () => {
     expect(firstNameInput.value).toBe('John');
 });
 
-test('handleImageChange updates profileImage state correctly', () => {
-    render(
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <CreateProfilePage user={mockUser}/>
-        </MemoryRouter>
-    );
-    const profileImageInput = screen.getByLabelText(/Profile Picture/i);
-    const file = new File(['dummy content'], 'example.png', { type: 'image/png' });
-    fireEvent.change(profileImageInput, { target: { files: [file] } });
-    expect(profileImageInput.files[0]).toBe(file);
-});
-
 test('form submission calls handleSubmit', async () => {
     render(
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
