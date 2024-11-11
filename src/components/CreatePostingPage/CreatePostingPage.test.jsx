@@ -368,3 +368,57 @@ test('form submission without authentication throws an error', async () => {
     expect(mockedUsedNavigate).toHaveBeenCalledWith('/posting-list');
     mockedUsedNavigate.mockRestore();
   });
+
+  test('should show error message when service type is not selected', async () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser}/>
+      </MemoryRouter>
+    );
+  
+    const postingNameInput = screen.getByLabelText(/Posting Name/i);
+    fireEvent.change(postingNameInput, { target: { value: 'Head Chef' } });
+  
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    fireEvent.change(descriptionInput, { target: { value: 'seeking Head Chef' } });
+  
+    const priceInput = screen.getByLabelText(/Price/i);
+    fireEvent.change(priceInput, { target: { value: '100' } });
+
+    const dropdownCategory = screen.getByLabelText('Category');
+    fireEvent.change(dropdownCategory, { target: { value: 'physical labor' } });
+  
+    const submitButton = screen.getByRole('button', { name: /Create Posting/i });
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+  
+    expect(screen.getByText('Please select a valid service type.')).toBeInTheDocument();
+  });
+
+  test('should show error message when category is not selected', async () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreatePostingPage user={mockUser}/>
+      </MemoryRouter>
+    );
+  
+    const postingNameInput = screen.getByLabelText(/Posting Name/i);
+    fireEvent.change(postingNameInput, { target: { value: 'Head Chef' } });
+  
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    fireEvent.change(descriptionInput, { target: { value: 'seeking Head Chef' } });
+  
+    const priceInput = screen.getByLabelText(/Price/i);
+    fireEvent.change(priceInput, { target: { value: '100' } });
+
+    const dropdownServiceType = screen.getByLabelText('Service Type');
+    fireEvent.change(dropdownServiceType, { target: { value: 'Requesting' } });
+  
+    const submitButton = screen.getByRole('button', { name: /Create Posting/i });
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+  
+    expect(screen.getByText('Please select a valid category.')).toBeInTheDocument();
+  });
