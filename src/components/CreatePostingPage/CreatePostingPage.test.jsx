@@ -73,8 +73,8 @@ test('renders the Posting Name input field', () => {
             <CreatePostingPage user={mockUser}/>
         </MemoryRouter>
     );
-    const firstNameInput = screen.getByLabelText(/Posting Name/i);
-    expect(firstNameInput).toBeInTheDocument();
+    const postingNameInput = screen.getByLabelText(/Posting Name/i);
+    expect(postingNameInput).toBeInTheDocument();
 });
 
 test('renders the Description input field', () => {
@@ -83,8 +83,8 @@ test('renders the Description input field', () => {
             <CreatePostingPage user={mockUser}/>
         </MemoryRouter>
     );
-    const firstNameInput = screen.getByLabelText(/Description/i);
-    expect(firstNameInput).toBeInTheDocument();
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    expect(descriptionInput).toBeInTheDocument();
 });
 
 test('renders the Price input field', () => {
@@ -93,8 +93,8 @@ test('renders the Price input field', () => {
             <CreatePostingPage user={mockUser}/>
         </MemoryRouter>
     );
-    const firstNameInput = screen.getByLabelText(/Price/i);
-    expect(firstNameInput).toBeInTheDocument();
+    const priceInput = screen.getByLabelText(/Price/i);
+    expect(priceInput).toBeInTheDocument();
 });
 
 test('renders the Service Type input field', () => {
@@ -103,8 +103,8 @@ test('renders the Service Type input field', () => {
             <CreatePostingPage user={mockUser}/>
         </MemoryRouter>
     );
-    const firstNameInput = screen.getByLabelText(/Service Type/i);
-    expect(firstNameInput).toBeInTheDocument();
+    const serviceTypeInput = screen.getByLabelText(/Service Type/i);
+    expect(serviceTypeInput).toBeInTheDocument();
 });
 
 test('renders the Category input field', () => {
@@ -113,8 +113,8 @@ test('renders the Category input field', () => {
             <CreatePostingPage user={mockUser}/>
         </MemoryRouter>
     );
-    const firstNameInput = screen.getByLabelText(/Category/i);
-    expect(firstNameInput).toBeInTheDocument();
+    const categoryInput = screen.getByLabelText(/Category/i);
+    expect(categoryInput).toBeInTheDocument();
 });
 
 test('renders the Upload an Image input field', () => {
@@ -123,6 +123,6 @@ test('renders the Upload an Image input field', () => {
             <CreatePostingPage user={mockUser}/>
         </MemoryRouter>
     );
-    const firstNameInput = screen.getByLabelText(/Upload an Image/i);
-    expect(firstNameInput).toBeInTheDocument();
+    const ImageInput = screen.getByLabelText(/Upload an Image/i);
+    expect(ImageInput).toBeInTheDocument();
 });
