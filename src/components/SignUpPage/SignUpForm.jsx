@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./SignUpForm.module.css";
 import { auth } from "../../firebase";
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import MailIcon from '@mui/icons-material/Mail';
 import KeyIcon from '@mui/icons-material/Key';
@@ -40,6 +40,10 @@ function SignUpForm() {
       console.log('User created successfully');
       navigate('/create-profile');
     } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        alert('This email is already in use.');
+        return;
+      }
       console.error(error);
       alert('User creation failed. Please check your email and password.');
     }
