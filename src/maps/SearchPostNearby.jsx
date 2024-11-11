@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import styles from './SearchPostNearby.module.css';
 import Button from '@mui/material/Button';
 import Header from '../components/Layout/Header';
+import userMarker from './userMarkerIcon.png'
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
@@ -16,6 +17,7 @@ const SearchPostNearby = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogLocation, setDialogLocation] = useState({});
   const [listOfLocations, setListOfLocations] = useState([]);
+  const [userMarkerIcon, setUserMarkerIcon] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -110,15 +112,27 @@ const SearchPostNearby = () => {
       <Header />
       <div className={styles.app}>
       <div className={styles.mapContainer}>
-        <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} onLoad={() => console.log('Maps API has loaded.')}>
+        <APIProvider 
+          apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+          onLoad={() => {
+            console.log('Maps API has loaded.');
+            setUserMarkerIcon({
+              url: userMarker,
+              scaledSize: new window.google.maps.Size(50, 50),
+            });
+          }}
+          >
           <Map
             style={{ borderRadius: "20px" }}
-            defaultZoom={13}
+            defaultZoom={15}
             defaultCenter={markerLocation}
             gestureHandling={"greedy"}
             disableDefaultUI
             onClick={(mapProps) => handleMapClick(mapProps)}
           >
+            {listOfLocations.map((loc) => (
+              <Marker key={loc.id} position={{ lat: loc.lat, lng: loc.lng }} />
+            ))}
             {showDialog && (
               <InfoWindow position={dialogLocation}>
                 <div>
@@ -128,7 +142,9 @@ const SearchPostNearby = () => {
                 </div>
               </InfoWindow>
             )}
-            <Marker position={markerLocation} />
+            
+            <Marker position={markerLocation}
+                    icon={userMarkerIcon}/>
           </Map>
         </APIProvider>
       </div>
