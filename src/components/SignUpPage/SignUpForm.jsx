@@ -25,8 +25,8 @@ function SignUpForm() {
       return;
     }
 
-    if (password.length <= 6) {
-      alert('Password must be greater than 6 characters.');
+    if (password.length < 6) {
+      alert('Password must be greater than or equal 6 characters.');
       return;
     }
 
