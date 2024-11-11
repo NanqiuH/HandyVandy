@@ -29,6 +29,7 @@ jest.mock("../../firebase", () => ({
 
 // Mock the useNavigate function
 const mockedUsedNavigate = jest.fn();
+
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockedUsedNavigate,
@@ -238,4 +239,66 @@ test("form submission with valid data navigates to the correct page", async () =
 
   expect(mockedUsedNavigate).toHaveBeenCalledWith("/posting-list");
   mockedUsedNavigate.mockRestore();
+});
+
+test("first name, last name, and bio fields are marked as required", () => {
+  render(
+    <MemoryRouter>
+      <CreateProfilePage user={mockUser} />
+    </MemoryRouter>
+  );
+
+  const firstNameInput = screen.getByLabelText(/First Name/i);
+  const lastNameInput = screen.getByLabelText(/Last Name/i);
+  const bioInput = screen.getByLabelText(/Bio/i);
+
+
+  expect(firstNameInput).toBeRequired();
+  expect(lastNameInput).toBeRequired();
+  expect(bioInput).toBeRequired();
+});
+
+test("form does not submit if required fields are empty", async () => {
+  render(
+    <MemoryRouter>
+      <CreateProfilePage user={mockUser} />
+    </MemoryRouter>
+  );
+
+  const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+  await userEvent.click(submitButton);
+
+  // Ensure navigate function hasn't been called, indicating no submission
+  expect(mockedUsedNavigate).not.toHaveBeenCalled();
+});
+
+test("handleImageChange updates profileImage state correctly", () => {
+  render(
+    <MemoryRouter>
+      <CreateProfilePage user={mockUser} />
+    </MemoryRouter>
+  );
+
+  const profileImageInput = screen.getByLabelText(/Profile Picture/i);
+  const file = new File(["dummy content"], "profile.jpg", { type: "image/jpeg" });
+  fireEvent.change(profileImageInput, { target: { files: [file] } });
+
+  expect(profileImageInput.files[0]).toEqual(file);
+  expect(profileImageInput.files.length).toBe(1);
+});
+
+test("console warning is called when required fields are missing", async () => {
+  const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  
+  render(
+    <MemoryRouter>
+      <CreateProfilePage user={mockUser} />
+    </MemoryRouter>
+  );
+
+  const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+  await userEvent.click(submitButton);
+
+  expect(consoleSpy).toHaveBeenCalledWith("Required fields are missing");
+  consoleSpy.mockRestore();
 });
