@@ -6,6 +6,9 @@ import { auth, db, storage } from '../../__mocks__/firebase'; // Imports the moc
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+const mockUser = {
+    uid: 'test-uid',
+  };
 
 jest.mock('firebase/firestore', () => ({
     doc: jest.fn(),
@@ -27,18 +30,21 @@ jest.mock('firebase/firestore', () => ({
   }));
 
   // Mock the useNavigate function
+  const mockNavigate = jest.fn();
   jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
-    useNavigate: jest.fn(),
+    useNavigate: () => mockNavigate,
   }));
   
-  
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   
 
 test('renders the Create Your Profile heading', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const headingElement = screen.getByText(/Create Your Profile/i);
@@ -47,8 +53,8 @@ test('renders the Create Your Profile heading', () => {
 
 test('renders the Create Profile button', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const buttonElement = screen.getByRole('button', { name: /Create Profile/i });
@@ -57,8 +63,8 @@ test('renders the Create Profile button', () => {
 
 test('renders the First Name input field', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const firstNameInput = screen.getByLabelText(/First Name/i);
@@ -67,8 +73,8 @@ test('renders the First Name input field', () => {
 
 test('renders the Last Name input field', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const lastNameInput = screen.getByLabelText(/Last Name/i);
@@ -77,8 +83,8 @@ test('renders the Last Name input field', () => {
 
 test('renders the Bio textarea', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const bioTextarea = screen.getByLabelText(/Bio/i);
@@ -87,8 +93,8 @@ test('renders the Bio textarea', () => {
 
 test('renders the Profile Picture file input', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const profileImageInput = screen.getByLabelText(/Profile Picture/i);
@@ -97,8 +103,8 @@ test('renders the Profile Picture file input', () => {
 
 test('renders the Middle Name input field', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const middleNameInput = screen.getByLabelText(/Middle Name \(optional\)/i);
@@ -107,8 +113,8 @@ test('renders the Middle Name input field', () => {
 
 test('first name input has the correct initial value', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const firstNameInput = screen.getByLabelText(/First Name/i);
@@ -117,8 +123,8 @@ test('first name input has the correct initial value', () => {
 
 test('last name input has the correct initial value', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const lastNameInput = screen.getByLabelText(/Last Name/i);
@@ -127,8 +133,8 @@ test('last name input has the correct initial value', () => {
 
 test('bio textarea has the correct initial value', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const bioTextarea = screen.getByLabelText(/Bio/i);
@@ -137,8 +143,8 @@ test('bio textarea has the correct initial value', () => {
 
 test('profile image input allows file selection', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const profileImageInput = screen.getByLabelText(/Profile Picture/i);
@@ -149,8 +155,8 @@ test('profile image input allows file selection', () => {
 
 test('handleChange updates formData state correctly', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const firstNameInput = screen.getByLabelText(/First Name/i);
@@ -160,8 +166,8 @@ test('handleChange updates formData state correctly', () => {
 
 test('handleImageChange updates profileImage state correctly', () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const profileImageInput = screen.getByLabelText(/Profile Picture/i);
@@ -172,8 +178,8 @@ test('handleImageChange updates profileImage state correctly', () => {
 
 test('form submission calls handleSubmit', async () => {
     render(
-        <MemoryRouter>
-            <CreateProfilePage />
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreateProfilePage user={mockUser}/>
         </MemoryRouter>
     );
     const submitButton = screen.getByRole('button', { name: /Create Profile/i });
@@ -186,8 +192,8 @@ test('form submission calls handleSubmit', async () => {
 test('form submission without authentication throws an error', async () => {
   auth.currentUser = null;
   render(
-    <MemoryRouter>
-      <CreateProfilePage />
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <CreateProfilePage user={mockUser}/>
     </MemoryRouter>
   );
   const submitButton = screen.getByRole('button', { name: /Create Profile/i });
@@ -200,8 +206,7 @@ test('form submission without authentication throws an error', async () => {
 
 test('form submission with valid data navigates to the correct page', async () => {
     const mockNavigate = jest.fn();
-    const { useNavigate } = require('react-router-dom');
-    useNavigate.mockReturnValue(mockNavigate);
+    jest.spyOn(require('react-router-dom'), 'useNavigate').mockReturnValue(mockNavigate);
   
     setDoc.mockResolvedValue({});
     ref.mockReturnValue({});
@@ -209,8 +214,8 @@ test('form submission with valid data navigates to the correct page', async () =
     getDownloadURL.mockResolvedValue('http://example.com/profile.jpg');
   
     render(
-      <MemoryRouter>
-        <CreateProfilePage />
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <CreateProfilePage user={mockUser}/>
       </MemoryRouter>
     );
   

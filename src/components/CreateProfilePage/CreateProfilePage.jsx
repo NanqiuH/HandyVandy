@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import styles from "./CreateProfilePage.module.css";
 import Header from "../Layout/Header"
 import { db } from "../../firebase";
@@ -41,7 +41,7 @@ function CreateProfilePage() {
     try {
       const user = auth.currentUser;
 
-      if (!user) {
+      if (!user || !user.uid) {
         throw new Error("User not authenticated");
       }
 
