@@ -1,46 +1,46 @@
 import LoginPage from "./LoginPage";
-import LoginForm from './LoginForm';
+import LoginForm from "./LoginForm";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { auth } from "../../__mocks__/firebase"; // Imports the mock functions (see __mock__/firebase.js)
 import userEvent from "@testing-library/user-event";
 
 const mockUser = {
-    uid: "test-uid",
-  };
-  
-  jest.mock("firebase/firestore", () => ({
-    collection: jest.fn(),
-    addDoc: jest.fn(),
-    doc: jest.fn(),
-    setDoc: jest.fn(),
-  }));
-  
-  jest.mock("firebase/storage", () => ({
-    ref: jest.fn(),
-    uploadBytes: jest.fn(),
-    getDownloadURL: jest.fn(),
-  }));
-  
-  jest.mock("../../firebase", () => ({
-    auth: {
-      currentUser: { uid: "test-uid" },
-    },
-    db: {},
-    storage: {},
-  }));
-  
-  // Mock the useNavigate function
-  const mockedUsedNavigate = jest.fn();
-  
-  jest.mock("react-router-dom", () => ({
-    ...jest.requireActual("react-router-dom"),
-    useNavigate: () => mockedUsedNavigate,
-  }));
-  
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  uid: "test-uid",
+};
+
+jest.mock("firebase/firestore", () => ({
+  collection: jest.fn(),
+  addDoc: jest.fn(),
+  doc: jest.fn(),
+  setDoc: jest.fn(),
+}));
+
+jest.mock("firebase/storage", () => ({
+  ref: jest.fn(),
+  uploadBytes: jest.fn(),
+  getDownloadURL: jest.fn(),
+}));
+
+jest.mock("../../firebase", () => ({
+  auth: {
+    currentUser: { uid: "test-uid" },
+  },
+  db: {},
+  storage: {},
+}));
+
+// Mock the useNavigate function
+const mockedUsedNavigate = jest.fn();
+
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockedUsedNavigate,
+}));
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 test("renders the LoginPage component", () => {
   render(
@@ -114,18 +114,86 @@ test("renders the welcome header", () => {
   expect(welcomeHeader).toBeInTheDocument();
 });
 
-test('Render Email and password successfully', async () => {
-    render(
-        <MemoryRouter
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
-        <LoginForm />
-      </MemoryRouter>
-    );
+test("Render Email and password successfully", async () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <LoginForm />
+    </MemoryRouter>
+  );
 
-    const emailInput = screen.getByPlaceholderText(/Email/i);
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    
-    expect(emailInput).toBeInTheDocument();
-    expect(passwordInput).toBeInTheDocument();
+  const emailInput = screen.getByPlaceholderText(/Email/i);
+  const passwordInput = screen.getByPlaceholderText(/Password/i);
+
+  expect(emailInput).toBeInTheDocument();
+  expect(passwordInput).toBeInTheDocument();
+});
+
+test("Render Remember me successfully", async () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <LoginForm />
+    </MemoryRouter>
+  );
+
+  const rememberMeInput = screen.getByLabelText(/Remember me/i);
+
+  expect(rememberMeInput).toBeInTheDocument();
+});
+
+test("Render Forgot Password successfully", async () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <LoginForm />
+    </MemoryRouter>
+  );
+
+  const forgotPasswordInput = screen.getByText(/Forgot Password?/i);
+
+  expect(forgotPasswordInput).toBeInTheDocument();
+});
+
+test("renders the Login button", () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <LoginForm />
+    </MemoryRouter>
+  );
+  const buttonElement = screen.getByRole("button", { name: /Login/i });
+  expect(buttonElement).toBeInTheDocument();
+});
+
+test("renders the Register button", () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <LoginForm />
+    </MemoryRouter>
+  );
+
+  const registerInput = screen.getByText(/Register/i);
+
+  expect(registerInput).toBeInTheDocument();
+});
+
+test("renders the remaining message", () => {
+  render(
+    <MemoryRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <LoginForm />
+    </MemoryRouter>
+  );
+
+  const input = screen.getByText(/Don't have an account?/i);
+
+  expect(input).toBeInTheDocument();
 });
