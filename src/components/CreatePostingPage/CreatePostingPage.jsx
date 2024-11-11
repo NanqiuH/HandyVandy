@@ -15,8 +15,8 @@ function CreatePostingPage() {
     description: "",
     price: "",
     postingImage: null,
-    serviceType: "none", // Default value for Service Type
-    category: "none", // Default value for Category
+    serviceType: "None", // Default value for Service Type
+    category: "None", // Default value for Category
   });
 
   // State to manage validation errors
@@ -75,11 +75,11 @@ function CreatePostingPage() {
 
     // Validation checks for empty or invalid fields
     let hasError = false;
-    if (formData.serviceType === "none") {
+    if (formData.serviceType === "None") {
       setServiceTypeError(true);
       hasError = true;
     }
-    if (formData.category === "none") {
+    if (formData.category === "None") {
       setCategoryError(true);
       hasError = true;
     }
@@ -228,7 +228,7 @@ function CreatePostingPage() {
                       onChange={handleServiceTypeChange}
                       className={`${styles.select} ${serviceTypeError ? styles.errorInput : ""}`}
                     >
-                      <option value="none">None</option>
+                      <option value="None">None</option>
                       <ServiceTypeOptions />
                     </select>
                     {serviceTypeError && (

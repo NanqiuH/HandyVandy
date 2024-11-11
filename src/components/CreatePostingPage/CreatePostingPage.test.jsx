@@ -126,3 +126,43 @@ test('renders the Upload an Image input field', () => {
     const ImageInput = screen.getByLabelText(/Upload an Image/i);
     expect(ImageInput).toBeInTheDocument();
 });
+
+test('Posting Name input field has the correct initial value', () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const postingNameInput = screen.getByLabelText(/Posting Name/i);
+    expect(postingNameInput.value).toBe('');
+});
+
+test('Description input field has the correct initial value', () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    expect(descriptionInput.value).toBe('');
+});
+
+test('Price input field has the correct initial value', () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const priceInput = screen.getByLabelText(/Price/i);
+    expect(priceInput.value).toBe('');
+});
+
+test('Service Type input field has the correct initial value', () => {
+    render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <CreatePostingPage user={mockUser}/>
+        </MemoryRouter>
+    );
+    const serviceTypeInput = screen.getByLabelText(/Service Type/i);
+    expect(serviceTypeInput.value).toBe('None');
+});
