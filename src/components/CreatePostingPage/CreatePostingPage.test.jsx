@@ -31,16 +31,15 @@ jest.mock('firebase/firestore', () => ({
     db: {},
     storage: {},
   }));
-
+  
   // Mock the useNavigate function
+  const mockedUsedNavigate = jest.fn();
+
   jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
-    useNavigate: jest.fn(),
+    useNavigate: () => mockedUsedNavigate,
 }));
 
-const mockNavigate = jest.fn();
-useNavigate.mockReturnValue(mockNavigate);
-  
   
 
 test('renders CreatePostingPage without crashing', () => {
@@ -338,8 +337,7 @@ test('form submission without authentication throws an error', async () => {
       expect(errorMessage).toBeNull();
   });
 
-  test('form submission with valid data navigates to the correct page', async () => {
-    
+  test('form submission with valid data navigates to the correct page', async () => { 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <CreatePostingPage user={mockUser}/>
@@ -367,7 +365,6 @@ test('form submission without authentication throws an error', async () => {
       fireEvent.click(submitButton);
     });
 
-    // await waitFor(() => {
-    //     expect(mockNavigate).toHaveBeenCalledWith('/posting-list');
-    // });
+    expect(mockedUsedNavigate).toHaveBeenCalledWith('/posting-list');
+    mockedUsedNavigate.mockRestore();
   });
