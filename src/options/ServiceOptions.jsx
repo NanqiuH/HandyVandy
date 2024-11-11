@@ -1,10 +1,10 @@
 function ServiceOptions() {
     return (
         <>
-            <option value="offering">Offering</option>
-            <option value="requesting">Requesting</option>
-            <option value="offering-with-delivery">Offering with Delivery</option>
-            <option value="requesting-with-delivery">Requesting with Delivery</option>
+            <option value="Offering">Offering</option>
+            <option value="Requesting">Requesting</option>
+            <option value="Offering-with-delivery">Offering with Delivery</option>
+            <option value="Requesting-with-delivery">Requesting with Delivery</option>
         </>
     );
 }
