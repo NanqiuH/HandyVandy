@@ -289,12 +289,12 @@ test("allows user to select an option from service type dropdown", () => {
   const dropdown = screen.getByLabelText("Service Type");
 
   // Simulate user selecting "Offering"
-  fireEvent.change(dropdown, { target: { value: "Offering" } });
+  fireEvent.change(dropdown, { target: { value: "offering" } });
   const selectedOption = screen.getByDisplayValue("Offering");
   expect(selectedOption).toBeInTheDocument();
 
   // Simulate user selecting "Requesting"
-  fireEvent.change(dropdown, { target: { value: "Requesting" } });
+  fireEvent.change(dropdown, { target: { value: "requesting" } });
   const selectedOptionTutoring = screen.getByDisplayValue("Requesting");
   expect(selectedOptionTutoring).toBeInTheDocument();
 });
