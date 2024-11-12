@@ -17,7 +17,7 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <Button className={styles.logoButton} onClick={() => navigate('/')}>
+      <Button className={styles.logoButton} onClick={() => navigate('/posting-list')}>
         <img src={HandyVandyLogo} alt="HandyVandy Logo" className={styles.logoImage} />
         <img src={HandyVandyLogoText} alt="HandyVandy Logo" className={styles.logoImage} />
       </Button>
