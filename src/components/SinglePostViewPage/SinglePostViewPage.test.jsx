@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import SinglePostingPage from "./SinglePostViewPage";
 import { auth } from "../../__mocks__/firebase"; // Imports the mock functions (see __mock__/firebase.js)
 import userEvent from "@testing-library/user-event";
-import { getDoc } from "firebase/firestore";
+import { getDoc, updateDoc } from "firebase/firestore";
 
 // Mock user data
 const mockUser = {
@@ -232,3 +232,350 @@ test("renders purchase button for non-owners and triggers purchase action", asyn
   auth.currentUser = originalAuthCurrentUser;
 });
 
+test("displays loading message and error if posting fetch fails", async () => {
+  getDoc.mockRejectedValueOnce(new Error("Failed to load posting."));
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  expect(screen.getByText(/Loading.../)).toBeInTheDocument();
+  await waitFor(() => {
+    expect(screen.getByText(/Failed to load posting/)).toBeInTheDocument();
+  });
+});
+
+test("saves changes after editing a posting", async () => {
+  // Mock Firestore data retrieval for the posting and user profile
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  // Render the component
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for the posting data to load
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
+
+  // Enable edit mode by clicking "Edit Posting"
+  fireEvent.click(screen.getByText("Edit Posting"));
+
+  // Change the posting name and description fields
+  fireEvent.change(screen.getByPlaceholderText("Posting Name"), { target: { value: "Updated Posting" } });
+  fireEvent.change(screen.getByPlaceholderText("Description"), { target: { value: "Updated description" } });
+
+  // Click "Save Changes" to submit the updates
+  fireEvent.click(screen.getByText("Save Changes"));
+
+  // Verify that the updated values are displayed in the UI
+  await waitFor(() => {
+    expect(screen.getByText("Updated Posting")).toBeInTheDocument();
+    expect(screen.getByText("Updated description")).toBeInTheDocument();
+    expect(screen.getByText("Price: $20.00")).toBeInTheDocument();
+    expect(screen.getByText("Category: Tutoring")).toBeInTheDocument();
+  });
+});
+
+test("uploads new image and updates posting on save", async () => {
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
+  fireEvent.click(screen.getByText("Edit Posting"));
+
+  // Simulate image file upload
+  const file = new File(["dummy content"], "new-image.jpg", { type: "image/jpg" });
+  const imageInput = screen.getByLabelText("Change Image:");
+  userEvent.upload(imageInput, file);
+
+  fireEvent.click(screen.getByText("Save Changes"));
+
+  await waitFor(() => {
+    expect(uploadBytes).toHaveBeenCalledWith(expect.anything(), file);
+    expect(updateDoc).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      postingImageUrl: "https://example.com/new-image.jpg",
+    }));
+  });
+});
+
+test("cancels edit mode without saving changes", async () => {
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
+  fireEvent.click(screen.getByText("Edit Posting"));
+
+  // Change the posting name and description
+  fireEvent.change(screen.getByLabelText("Posting Name:"), { target: { value: "Changed Posting" } });
+  fireEvent.change(screen.getByLabelText("Description:"), { target: { value: "Changed description" } });
+
+  // Click "Cancel" or close edit mode without saving
+  fireEvent.click(screen.getByText("Edit Posting"));
+
+  // Ensure updateDoc was not called, meaning changes weren't saved
+  expect(updateDoc).not.toHaveBeenCalled();
+  expect(screen.getByText(mockPostingOwner.description)).toBeInTheDocument();
+});
+
+test("navigates to chat with posting owner when 'Message' button is clicked", async () => {
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
+
+  // Simulate clicking the "Message" button
+  fireEvent.click(screen.getByText(`Message ${mockUser.firstName} ${mockUser.lastName}`));
+
+  // Ensure navigation to the chat page
+  expect(mockedUsedNavigate).toHaveBeenCalledWith(`/chat/${mockPostingOwner.postingUID}`);
+});
+
+test("displays purchase and message buttons for non-owner", async () => {
+  // Mock getDoc to return posting data for non-owner scenario
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingNonOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for the posting data to load
+  await waitFor(() => screen.getByText(mockPostingNonOwner.postingName));
+
+  // Ensure the "Edit" and "Delete" buttons are not visible to non-owner
+  expect(screen.queryByText("Edit Posting")).not.toBeInTheDocument();
+  expect(screen.queryByText("Delete Post")).not.toBeInTheDocument();
+
+  // Check that "Purchase" and "Message" buttons are visible for non-owner
+  expect(screen.getByRole("button", { name: /Purchase/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Message/i })).toBeInTheDocument();
+});
+
+test("non-owner can initiate purchase of the posting", async () => {
+  // Mock getDoc to return posting data for non-owner scenario
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingNonOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  // Mock alert function
+  window.alert = jest.fn();
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load
+  await waitFor(() => screen.getByText(mockPostingNonOwner.postingName));
+
+  // Click "Purchase" button and verify alert
+  fireEvent.click(screen.getByRole("button", { name: /Purchase/i }));
+  expect(window.alert).toHaveBeenCalledWith(`You have purchased: ${mockPostingNonOwner.postingName}`);
+});
+
+test("non-owner can message the posting owner", async () => {
+  // Mock getDoc to return posting data for non-owner scenario
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingNonOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load
+  await waitFor(() => screen.getByText(mockPostingNonOwner.postingName));
+
+  // Click "Message" button to navigate to chat with posting owner
+  fireEvent.click(screen.getByRole("button", { name: /Message/i }));
+
+  // Verify navigation to chat with posting owner
+  expect(mockedUsedNavigate).toHaveBeenCalledWith(`/chat/${mockPostingNonOwner.postingUID}`);
+});
+
+test("displays correct posting information for non-owner", async () => {
+  // Mock getDoc to return posting data for non-owner scenario
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingNonOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load
+  await waitFor(() => screen.getByText(mockPostingNonOwner.postingName));
+
+  // Check posting information displayed for non-owner
+  expect(screen.getByText(mockPostingNonOwner.postingName)).toBeInTheDocument();
+  expect(screen.getByText(mockPostingNonOwner.description)).toBeInTheDocument();
+  expect(screen.getByText("Price: $15.00")).toBeInTheDocument();
+  expect(screen.getByText("Category: Tutoring")).toBeInTheDocument();
+  expect(screen.getByText("Posted by: John Doe")).toBeInTheDocument();
+});
+
+test("displays loading state initially", async () => {
+  // Mock getDoc to delay resolution
+  getDoc.mockImplementationOnce(
+    () => new Promise((resolve) => setTimeout(() => resolve({ exists: () => true, data: () => mockPostingNonOwner }), 100))
+  );
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Check for loading state before data loads
+  expect(screen.getByText(/Loading.../)).toBeInTheDocument();
+
+  // Wait for loading state to disappear
+  await waitFor(() => {
+    expect(screen.queryByText(/Loading.../)).not.toBeInTheDocument();
+  });
+});
+
+test("displays error message when posting data fails to load", async () => {
+  // Mock Firestore to simulate a data fetch error
+  getDoc.mockRejectedValueOnce(new Error("Failed to load posting data"));
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for error message to appear
+  await waitFor(() => {
+    expect(screen.getByText(/Failed to load posting./)).toBeInTheDocument();
+  });
+});
+
+test("prevents non-owner from entering edit mode", async () => {
+  // Mock Firestore to load posting data as non-owner
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingNonOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  // Mock alert to check for edit prevention message
+  window.alert = jest.fn();
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load
+  await waitFor(() => screen.getByText(mockPostingNonOwner.postingName));
+
+  // Attempt to toggle edit mode as non-owner
+  fireEvent.click(screen.getByText("Edit Posting"));
+
+  // Verify alert shows restriction message for non-owner
+  expect(window.alert).toHaveBeenCalledWith("You can only edit your own posting.");
+});
+
+test("displays default image if postingImageUrl is missing", async () => {
+  // Remove postingImageUrl from mock data to simulate missing field
+  const mockPostingWithoutImage = { ...mockPostingNonOwner };
+  delete mockPostingWithoutImage.postingImageUrl;
+
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingWithoutImage });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load and verify default image is displayed
+  await waitFor(() => {
+    const defaultImage = screen.getByAltText(mockPostingNonOwner.postingName);
+    expect(defaultImage.src).toContain("HandyVandyLogo.png"); // Assuming HandyVandyLogo is the default
+  });
+});
+
+test("displays 'N/A' for missing category", async () => {
+  // Remove category from mock data to simulate missing field
+  const mockPostingWithoutCategory = { ...mockPostingNonOwner };
+  delete mockPostingWithoutCategory.category;
+
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingWithoutCategory });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load and check if 'N/A' is displayed for category
+  await waitFor(() => {
+    expect(screen.getByText("Category: N/A")).toBeInTheDocument();
+  });
+});
+
+test("displays last updated timestamp if available", async () => {
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingNonOwner });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load and check for last updated timestamp
+  await waitFor(() => {
+    expect(screen.getByText(/Last updated on:/)).toBeInTheDocument();
+    expect(screen.getByText(/11\/11\/2024, 6:00:00 AM/)).toBeInTheDocument(); // Adjust format if necessary
+  });
+});
+
+test("displays only created date if updatedAt is missing", async () => {
+  // Remove updatedAt from mock data to simulate missing field
+  const mockPostingWithoutUpdatedAt = { ...mockPostingNonOwner };
+  delete mockPostingWithoutUpdatedAt.updatedAt;
+
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockPostingWithoutUpdatedAt });
+  getDoc.mockResolvedValueOnce({ exists: () => true, data: () => mockUser });
+
+  render(
+    <MemoryRouter>
+      <SinglePostingPage />
+    </MemoryRouter>
+  );
+
+  // Wait for posting data to load and check for created date only
+  await waitFor(() => {
+    expect(screen.getByText(/Posted on:/)).toBeInTheDocument();
+    expect(screen.queryByText(/Last updated on:/)).not.toBeInTheDocument();
+  });
+});

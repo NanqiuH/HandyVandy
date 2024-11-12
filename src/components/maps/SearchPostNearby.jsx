@@ -19,6 +19,9 @@ import Header from "../Layout/Header";
 import userMarker from "../../images/userMarkerIcon.png";
 import { getLocationName } from "./locationUtils";
 import { fetchLocations } from "./fetchLocations";
+import { handleMapClick } from "./mapHandlers";
+import { saveLocation } from "./saveLocations";
+import { handleDeleteLocation } from "./handleDeleteLocation";
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
@@ -56,89 +59,40 @@ const SearchPostNearby = () => {
     }
   }, []);
 
-  const handleMapClick = async (mapProps) => {
-    if (mapProps.detail.placeId) {
-      const lat = mapProps.detail.latLng.lat;
-      const lng = mapProps.detail.latLng.lng;
-      try {
-        const locationName = await getLocationName(lat, lng);
-        setShowDialog(true);
-        setDialogLocation({ lat, lng });
-        if (user && user.uid) {
-          setSelectedLocation({
-            lat,
-            lng,
-            name: locationName,
-            userId: user.uid,
-          });
-        } else {
-          console.error("User is not defined or user.uid is not available");
-          alert("User information is not available. Please log in.");
-        }
-      } catch (error) {
-        console.error("Error getting location name:", error);
-        alert("Failed to get location name. Please try again.");
-      }
-    } else {
-      alert("Please select the specific location");
-    }
-  };
-
-  const saveLocation = async () => {
-    try {
-      await addDoc(collection(db, "locations"), selectedLocation);
-      (async () => {
-        const locations = await fetchLocations();
-        setListOfLocations(locations);
-      })();
-      setShowDialog(false); // Close the dialog after saving
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
-
-  // const fetchLocations = async () => {
-  //   try {
-  //     const locationsCollection = collection(db, "locations");
-  //     console.log("Fetching locations from collection:", locationsCollection);
-  //     const querySnapshot = await getDocs(locationsCollection);
-  //     console.log("Query snapshot:", querySnapshot);
-
-  //     if (!querySnapshot || querySnapshot.empty) {
-  //       console.log("No matching documents.");
-  //       setListOfLocations([]);
-  //     } else {
-  //       const locations = querySnapshot.docs.map((doc) => ({
-  //         ...doc.data(),
-  //         id: doc.id,
-  //       }));
-  //       setListOfLocations(locations);
+  // const handleMapClick = async (mapProps) => {
+  //   if (mapProps.detail.placeId) {
+  //     const lat = mapProps.detail.latLng.lat;
+  //     const lng = mapProps.detail.latLng.lng;
+  //     try {
+  //       const locationName = await getLocationName(lat, lng);
+  //       setShowDialog(true);
+  //       setDialogLocation({ lat, lng });
+  //       if (user && user.uid) {
+  //         setSelectedLocation({
+  //           lat,
+  //           lng,
+  //           name: locationName,
+  //           userId: user.uid,
+  //         });
+  //       } else {
+  //         console.error("User is not defined or user.uid is not available");
+  //         alert("User information is not available. Please log in.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error getting location name:", error);
+  //       alert("Failed to get location name. Please try again.");
   //     }
-  //   } catch (error) {
-  //     console.error("Error fetching locations: ", error);
-  //     setListOfLocations([]);
+  //   } else {
+  //     alert("Please select the specific location");
   //   }
   // };
 
+  const saveLocations = async () => {
+    await saveLocation(selectedLocation, setListOfLocations, setShowDialog);
+  };
+
   const onDeleteLocation = async (loc) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this location?"
-    );
-    if (confirmed) {
-      if (loc.userId === user.uid) {
-        try {
-          await deleteDoc(doc(db, "locations", loc.id));
-          (async () => {
-            const locations = await fetchLocations();
-            setListOfLocations(locations);
-          })();
-        } catch (e) {
-          console.error("Error deleting document: ", e);
-        }
-      } else {
-        alert("You do not have permission to delete this location.");
-      }
-    }
+    await handleDeleteLocation(loc, user, setListOfLocations);
   };
 
   const onViewLocation = (loc) => {
@@ -149,7 +103,7 @@ const SearchPostNearby = () => {
     <>
       <Header />
       <div className={styles.app}>
-        <div className={styles.mapContainer} data-testid="map">
+        <div className={styles.mapContainer}>
           <APIProvider
             apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
             onLoad={() => {
@@ -166,7 +120,7 @@ const SearchPostNearby = () => {
               defaultCenter={markerLocation}
               gestureHandling={"greedy"}
               disableDefaultUI
-              onClick={(mapProps) => handleMapClick(mapProps)}
+              onClick={(mapProps) => handleMapClick(mapProps, setShowDialog, setDialogLocation, setSelectedLocation, user)}
             >
               {listOfLocations.map((loc) => (
                   <Marker
@@ -179,7 +133,7 @@ const SearchPostNearby = () => {
                 <InfoWindow data-testid="info-window" position={dialogLocation}>
                   <div>
                     <p>Do you want to save this location?</p>
-                    <Button onClick={saveLocation}>Save</Button>
+                    <Button onClick={saveLocations}>Save</Button>
                     <Button onClick={() => setShowDialog(false)}>Cancel</Button>
                   </div>
                 </InfoWindow>
