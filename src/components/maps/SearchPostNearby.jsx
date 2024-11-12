@@ -149,7 +149,7 @@ const SearchPostNearby = () => {
     <>
       <Header />
       <div className={styles.app}>
-        <div className={styles.mapContainer} data-testid="map">
+        <div className={styles.mapContainer}>
           <APIProvider
             apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
             onLoad={() => {
