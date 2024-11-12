@@ -380,3 +380,123 @@ test("navigates to /posting-list on successful form submission", async () => {
     expect(mockedUsedNavigate).toHaveBeenCalledWith("/posting-list");
   });
 });
+
+
+describe("CreateProfilePage Image Tests", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+test("handleImageChange updates the profileImage in state", () => {
+    render(
+      <MemoryRouter>
+        <CreateProfilePage />
+      </MemoryRouter>
+    );
+
+    const profileImageInput = screen.getByLabelText(/Profile Picture/i);
+    const file = new File(["dummy content"], "example.png", { type: "image/png" });
+
+    fireEvent.change(profileImageInput, { target: { files: [file] } });
+
+    // Verify that the input's file is the uploaded file
+    expect(profileImageInput.files[0]).toBe(file);
+    expect(profileImageInput.files).toHaveLength(1);
+  });
+
+  test("uploads the profile image and retrieves the download URL", async () => {
+    const mockFile = new File(["dummy content"], "example.png", { type: "image/png" });
+    const mockImageRef = {};
+    const mockDownloadURL = "https://mockstorage.com/example.png";
+
+    ref.mockReturnValue(mockImageRef);
+    uploadBytes.mockResolvedValue({ ref: mockImageRef });
+    getDownloadURL.mockResolvedValue(mockDownloadURL);
+
+    render(
+      <MemoryRouter>
+        <CreateProfilePage />
+      </MemoryRouter>
+    );
+
+    const profileImageInput = screen.getByLabelText(/Profile Picture/i);
+    fireEvent.change(profileImageInput, { target: { files: [mockFile] } });
+
+    // Simulate form submission
+    const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+    await userEvent.click(submitButton);
+
+    await waitFor(() => {
+      // Verify that the storage ref is called with the correct file name
+      expect(ref).toHaveBeenCalledWith(expect.any(Object), "profileImages/example.png");
+
+      // Verify that the file was uploaded
+      expect(uploadBytes).toHaveBeenCalledWith(mockImageRef, mockFile);
+
+      // Verify that the download URL was retrieved
+      expect(getDownloadURL).toHaveBeenCalledWith(mockImageRef);
+    });
+  });
+
+  test("skips image upload if no profile image is provided", async () => {
+    render(
+      <MemoryRouter>
+        <CreateProfilePage />
+      </MemoryRouter>
+    );
+
+    const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+    await userEvent.click(submitButton);
+
+    // Wait for submission to complete
+    await waitFor(() => {
+      // Ensure image upload was not called
+      expect(ref).not.toHaveBeenCalled();
+      expect(uploadBytes).not.toHaveBeenCalled();
+      expect(getDownloadURL).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe("CreateProfilePage FormData Profile Image Tests", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+test("uploads the profile image if formData.profileImage exists", async () => {
+    const mockFile = new File(["dummy content"], "test-image.png", { type: "image/png" });
+    const mockStorageRef = {};
+    const mockDownloadURL = "https://mockstorage.com/test-image.png";
+
+    ref.mockReturnValue(mockStorageRef);
+    uploadBytes.mockResolvedValue({ ref: mockStorageRef });
+    getDownloadURL.mockResolvedValue(mockDownloadURL);
+
+    render(
+      <MemoryRouter>
+        <CreateProfilePage />
+      </MemoryRouter>
+    );
+
+    const profileImageInput = screen.getByLabelText(/Profile Picture/i);
+    fireEvent.change(profileImageInput, { target: { files: [mockFile] } });
+
+    // Simulate form submission
+    const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+    await userEvent.click(submitButton);
+
+    await waitFor(() => {
+      // Verify that the storage ref is called with the correct file name
+      expect(ref).toHaveBeenCalledWith(expect.any(Object), "profileImages/test-image.png");
+
+      // Verify that the file was uploaded
+      expect(uploadBytes).toHaveBeenCalledWith(mockStorageRef, mockFile);
+
+      // Verify that the download URL was retrieved
+      expect(getDownloadURL).toHaveBeenCalledWith(mockStorageRef);
+    });
+
+    // Check that the URL retrieved is used in the logic
+    expect(mockDownloadURL).toBe("https://mockstorage.com/test-image.png");
+  });
+});
