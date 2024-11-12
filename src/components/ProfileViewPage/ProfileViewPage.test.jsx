@@ -124,7 +124,6 @@ test("renders profile view page", async () => {
   );
   expect(screen.getByText(mockUser.bio)).toBeInTheDocument();
   expect(screen.getByAltText(`${mockUser.firstName} ${mockUser.lastName}`)).toBeInTheDocument();
-
   // Restore original auth.currentUser
   auth.currentUser = originalAuthCurrentUser;
 });
@@ -207,3 +206,29 @@ test("navigates to review creation page when clicking 'Leave a Review' button", 
   // Restore the original auth.currentUser
   auth.currentUser = originalAuthCurrentUser;
 });
+
+test("displays error message when profile does not exist", async () => {
+  getDoc.mockResolvedValueOnce({
+    exists: jest.fn().mockReturnValue(false),
+  });
+
+  render(
+    <MemoryRouter
+      initialEntries={["/profile/123"]}
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <Routes>
+        <Route path="/profile/:id" element={<ProfileViewPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  await waitFor(() => screen.getByText("Failed to load profile."));
+  expect(screen.getByText("Failed to load profile.")).toBeInTheDocument();
+});
+
+
+
