@@ -19,6 +19,7 @@ import Header from "../Layout/Header";
 import userMarker from "../../images/userMarkerIcon.png";
 import { getLocationName } from "./locationUtils";
 import { fetchLocations } from "./fetchLocations";
+import { handleMapClick } from "./mapHandlers";
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
@@ -56,33 +57,33 @@ const SearchPostNearby = () => {
     }
   }, []);
 
-  const handleMapClick = async (mapProps) => {
-    if (mapProps.detail.placeId) {
-      const lat = mapProps.detail.latLng.lat;
-      const lng = mapProps.detail.latLng.lng;
-      try {
-        const locationName = await getLocationName(lat, lng);
-        setShowDialog(true);
-        setDialogLocation({ lat, lng });
-        if (user && user.uid) {
-          setSelectedLocation({
-            lat,
-            lng,
-            name: locationName,
-            userId: user.uid,
-          });
-        } else {
-          console.error("User is not defined or user.uid is not available");
-          alert("User information is not available. Please log in.");
-        }
-      } catch (error) {
-        console.error("Error getting location name:", error);
-        alert("Failed to get location name. Please try again.");
-      }
-    } else {
-      alert("Please select the specific location");
-    }
-  };
+  // const handleMapClick = async (mapProps) => {
+  //   if (mapProps.detail.placeId) {
+  //     const lat = mapProps.detail.latLng.lat;
+  //     const lng = mapProps.detail.latLng.lng;
+  //     try {
+  //       const locationName = await getLocationName(lat, lng);
+  //       setShowDialog(true);
+  //       setDialogLocation({ lat, lng });
+  //       if (user && user.uid) {
+  //         setSelectedLocation({
+  //           lat,
+  //           lng,
+  //           name: locationName,
+  //           userId: user.uid,
+  //         });
+  //       } else {
+  //         console.error("User is not defined or user.uid is not available");
+  //         alert("User information is not available. Please log in.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error getting location name:", error);
+  //       alert("Failed to get location name. Please try again.");
+  //     }
+  //   } else {
+  //     alert("Please select the specific location");
+  //   }
+  // };
 
   const saveLocation = async () => {
     try {
@@ -166,7 +167,7 @@ const SearchPostNearby = () => {
               defaultCenter={markerLocation}
               gestureHandling={"greedy"}
               disableDefaultUI
-              onClick={(mapProps) => handleMapClick(mapProps)}
+              onClick={(mapProps) => handleMapClick(mapProps, setShowDialog, setDialogLocation, setSelectedLocation, user)}
             >
               {listOfLocations.map((loc) => (
                   <Marker
