@@ -49,7 +49,8 @@ function ReviewPage() {
       revieweeName,
       createdAt: timestamp,
     });
-    // ...
+    alert("Review submitted successfully!");
+    navigate("/profile-list");
   } catch (error) {
     console.error("Error adding review or updating profile: ", error);
   }
