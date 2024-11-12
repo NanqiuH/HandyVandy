@@ -7,6 +7,7 @@ import Header from "../Layout/Header";
 import styles from "./SinglePostViewPage.module.css";
 import HandyVandyLogo from "../../images/HandyVandyV.png";
 import ServiceOptions from "../../options/ServiceOptions";
+import CategoryOptions from "../../options/CategoryOptions";
 
 function SinglePostingPage() {
   const { id } = useParams();
@@ -265,11 +266,7 @@ function SinglePostingPage() {
                         onChange={handleInputChange}
                         className={styles.select}
                       >
-                        <option value="Cleaning">Cleaning</option>
-                        <option value="Handyman">Handyman</option>
-                        <option value="Tutoring">Tutoring</option>
-                        <option value="Delivery">Delivery</option>
-                        <option value="Other">Other</option>
+                        <CategoryOptions />
                       </select>
                     </div>
                   </div>
