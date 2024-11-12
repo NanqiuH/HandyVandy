@@ -3,12 +3,13 @@ import { MemoryRouter } from "react-router-dom";
 import SearchPostNearby from "./SearchPostNearby";
 import { auth } from "../../__mocks__/firebase"; // Imports the mock functions (see __mock__/firebase.js)
 import userEvent from "@testing-library/user-event";
-import { fetchLocations } from "./SearchPostNearby";
+import * as fetchLocationsModule from './fetchLocations';
 import React from "react";
 
 const mockUser = {
   uid: "test-uid",
 };
+
 
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
@@ -70,13 +71,13 @@ test("should set the current user on mount", async () => {
 });
 
 test('should fetch locations on mount', async () => {
-    const fetchLocations = jest.fn();
+    const fetchLocations = jest.spyOn(fetchLocationsModule, 'fetchLocations');
 
     render(
         <MemoryRouter
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
-          <SearchPostNearby fetchLocations={fetchLocations}/>
+          <SearchPostNearby/>
         </MemoryRouter>
       );
       await waitFor(() => {
@@ -84,3 +85,33 @@ test('should fetch locations on mount', async () => {
       });
   });
 
+//   test('should handle geolocation error', async () => {
+//     const mockGeolocation = {
+//         getCurrentPosition: jest.fn().mockImplementationOnce((success, error) =>
+//           error({
+//             code: 1,
+//             message: 'User denied geolocation',
+//           })
+//         ),
+//       };
+    
+//       global.navigator.geolocation = mockGeolocation;
+    
+//       console.error = jest.fn();
+    
+//       fetchLocations.mockResolvedValue([]); // Mock fetchLocations to return an empty array
+    
+//       render(
+//         <MemoryRouter>
+//           <SearchPostNearby />
+//         </MemoryRouter>
+//       );
+    
+//       await waitFor(() => {
+//         expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();
+//         expect(console.error).toHaveBeenCalledWith(
+//           'Error getting current location:',
+//           expect.any(Object)
+//         );
+//       });
+//   });
