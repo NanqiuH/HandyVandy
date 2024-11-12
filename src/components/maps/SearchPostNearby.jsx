@@ -20,6 +20,8 @@ import userMarker from "../../images/userMarkerIcon.png";
 import { getLocationName } from "./locationUtils";
 import { fetchLocations } from "./fetchLocations";
 import { handleMapClick } from "./mapHandlers";
+import { saveLocation } from "./saveLocations";
+import { handleDeleteLocation } from "./handleDeleteLocation";
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
@@ -85,61 +87,12 @@ const SearchPostNearby = () => {
   //   }
   // };
 
-  const saveLocation = async () => {
-    try {
-      await addDoc(collection(db, "locations"), selectedLocation);
-      (async () => {
-        const locations = await fetchLocations();
-        setListOfLocations(locations);
-      })();
-      setShowDialog(false); // Close the dialog after saving
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+  const saveLocations = async () => {
+    await saveLocation(selectedLocation, setListOfLocations, setShowDialog);
   };
 
-  // const fetchLocations = async () => {
-  //   try {
-  //     const locationsCollection = collection(db, "locations");
-  //     console.log("Fetching locations from collection:", locationsCollection);
-  //     const querySnapshot = await getDocs(locationsCollection);
-  //     console.log("Query snapshot:", querySnapshot);
-
-  //     if (!querySnapshot || querySnapshot.empty) {
-  //       console.log("No matching documents.");
-  //       setListOfLocations([]);
-  //     } else {
-  //       const locations = querySnapshot.docs.map((doc) => ({
-  //         ...doc.data(),
-  //         id: doc.id,
-  //       }));
-  //       setListOfLocations(locations);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching locations: ", error);
-  //     setListOfLocations([]);
-  //   }
-  // };
-
   const onDeleteLocation = async (loc) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this location?"
-    );
-    if (confirmed) {
-      if (loc.userId === user.uid) {
-        try {
-          await deleteDoc(doc(db, "locations", loc.id));
-          (async () => {
-            const locations = await fetchLocations();
-            setListOfLocations(locations);
-          })();
-        } catch (e) {
-          console.error("Error deleting document: ", e);
-        }
-      } else {
-        alert("You do not have permission to delete this location.");
-      }
-    }
+    await handleDeleteLocation(loc, user, setListOfLocations);
   };
 
   const onViewLocation = (loc) => {
@@ -180,7 +133,7 @@ const SearchPostNearby = () => {
                 <InfoWindow data-testid="info-window" position={dialogLocation}>
                   <div>
                     <p>Do you want to save this location?</p>
-                    <Button onClick={saveLocation}>Save</Button>
+                    <Button onClick={saveLocations}>Save</Button>
                     <Button onClick={() => setShowDialog(false)}>Cancel</Button>
                   </div>
                 </InfoWindow>
