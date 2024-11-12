@@ -34,7 +34,10 @@ const SearchPostNearby = () => {
 
   useEffect(() => {
     setUser(auth.currentUser);
-    fetchLocations().then(setListOfLocations);
+    (async () => {
+      const locations = await fetchLocations();
+      setListOfLocations(locations);
+    })();
   }, []);
 
   useEffect(() => {
@@ -84,7 +87,10 @@ const SearchPostNearby = () => {
   const saveLocation = async () => {
     try {
       await addDoc(collection(db, "locations"), selectedLocation);
-      fetchLocations().then(setListOfLocations);
+      (async () => {
+        const locations = await fetchLocations();
+        setListOfLocations(locations);
+      })();
       setShowDialog(false); // Close the dialog after saving
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -122,7 +128,10 @@ const SearchPostNearby = () => {
       if (loc.userId === user.uid) {
         try {
           await deleteDoc(doc(db, "locations", loc.id));
-          fetchLocations().then(setListOfLocations);
+          (async () => {
+            const locations = await fetchLocations();
+            setListOfLocations(locations);
+          })();
         } catch (e) {
           console.error("Error deleting document: ", e);
         }
