@@ -48,7 +48,7 @@ function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <IconButton
+        <IconButton data-testid="toggle-visibility"
           onClick={() => setShowPassword(!showPassword)}
           edge="end"
         >
