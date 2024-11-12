@@ -106,11 +106,11 @@ function SinglePostingPage() {
       const existingCreatedAt = postingSnap.exists() ? postingSnap.data().createdAt : new Date().toISOString();
       let postingImageUrl = posting.postingImageUrl;
 
-      // if (updatedData.postingImage) {
-      //   const imageRef = ref(storage, `postingImages/${updatedData.postingImage.name}`);
-      //   await uploadBytes(imageRef, updatedData.postingImage);
-      //   postingImageUrl = await getDownloadURL(imageRef);
-      // }
+      if (updatedData.postingImage) {
+        const imageRef = ref(storage, `postingImages/${updatedData.postingImage.name}`);
+        await uploadBytes(imageRef, updatedData.postingImage);
+        postingImageUrl = await getDownloadURL(imageRef);
+      }
 
       const timestamp = new Date().toISOString();
 
