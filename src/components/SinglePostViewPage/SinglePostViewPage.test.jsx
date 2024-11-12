@@ -13,13 +13,25 @@ const mockUser = {
 };
 
 // Mock posting data
-const mockPosting = {
+const mockPostingOwner = {
   postingName: "Test Posting",
   description: "This is a test description",
   price: "20.00",
   serviceType: "offering",
   category: "Tutoring",
   postingUID: "test-uid",
+  postingImageUrl: "https://example.com/image.jpg",
+  createdAt: "2024-11-11T10:00:00Z",
+  updatedAt: "2024-11-11T12:00:00Z",
+};
+
+const mockPostingNonOwner = {
+  postingName: "Test Posting",
+  description: "This is a test description",
+  price: "20.00",
+  serviceType: "offering",
+  category: "Tutoring",
+  postingUID: "test-uid-non",
   postingImageUrl: "https://example.com/image.jpg",
   createdAt: "2024-11-11T10:00:00Z",
   updatedAt: "2024-11-11T12:00:00Z",
@@ -69,7 +81,7 @@ test("renders SinglePostingPage with mock data", async () => {
   // Mock Firestore document fetch for posting and user profile
   getDoc.mockResolvedValueOnce({
     exists: () => true,
-    data: () => mockPosting,
+    data: () => mockPostingOwner,
   }); // First call for the posting
 
   getDoc.mockResolvedValueOnce({
@@ -87,13 +99,13 @@ test("renders SinglePostingPage with mock data", async () => {
   );
 
   // Wait for the posting data to appear in the document
-  await waitFor(() => screen.getByText(mockPosting.postingName));
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
 
   // Check if posting data is rendered
-  expect(screen.getByText(mockPosting.postingName)).toBeInTheDocument();
-  expect(screen.getByText(mockPosting.description)).toBeInTheDocument();
-  expect(screen.getByText(`Price: $${mockPosting.price}`)).toBeInTheDocument();
-  expect(screen.getByText(`Category: ${mockPosting.category}`)).toBeInTheDocument();
+  expect(screen.getByText(mockPostingOwner.postingName)).toBeInTheDocument();
+  expect(screen.getByText(mockPostingOwner.description)).toBeInTheDocument();
+  expect(screen.getByText(`Price: $${mockPostingOwner.price}`)).toBeInTheDocument();
+  expect(screen.getByText(`Category: ${mockPostingOwner.category}`)).toBeInTheDocument();
   expect(screen.getByText(`Posted by: ${mockUser.firstName} ${mockUser.lastName}`)).toBeInTheDocument();
 });
 
@@ -101,7 +113,7 @@ test("renders edit button for post owner and toggles edit mode", async () => {
   // Mock Firestore document fetch for posting and user profile
   getDoc.mockResolvedValueOnce({
     exists: () => true,
-    data: () => mockPosting,
+    data: () => mockPostingOwner,
   }); // First call for the posting
 
   getDoc.mockResolvedValueOnce({
@@ -119,7 +131,7 @@ test("renders edit button for post owner and toggles edit mode", async () => {
   );
 
   // Wait for posting data
-  await waitFor(() => screen.getByText(mockPosting.postingName));
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
 
   // Check if "Edit Posting" button is visible for the owner
   expect(screen.getByText("Edit Posting")).toBeInTheDocument();
@@ -136,7 +148,7 @@ test("renders delete button for post owner and triggers delete action", async ()
   // Mock Firestore document fetch for posting and user profile
   getDoc.mockResolvedValueOnce({
     exists: () => true,
-    data: () => mockPosting,
+    data: () => mockPostingOwner,
   }); // First call for the posting
 
   getDoc.mockResolvedValueOnce({
@@ -157,7 +169,7 @@ test("renders delete button for post owner and triggers delete action", async ()
   );
 
   // Wait for posting data
-  await waitFor(() => screen.getByText(mockPosting.postingName));
+  await waitFor(() => screen.getByText(mockPostingOwner.postingName));
 
   // Check if "Delete Post" button is visible for the owner
   expect(screen.getByText("Delete Post")).toBeInTheDocument();
@@ -170,24 +182,24 @@ test("renders delete button for post owner and triggers delete action", async ()
 });
 
 test("renders purchase button for non-owners and triggers purchase action", async () => {
-  // Mock Firestore document fetch for posting
+  // Mock posting data for a non-owner
   getDoc.mockResolvedValueOnce({
     exists: () => true,
-    data: () => mockPosting,
+    data: () => mockPostingNonOwner,
   });
 
-  // Set up the non-owner user
-  const mockNonOwnerUser = { uid: "non-owner-uid", firstName: "Jane", lastName: "Smith" };
-
-  // Temporarily mock auth.currentUser to simulate a different, non-owner UID
+  // Mock user as non-owner
   const originalAuthCurrentUser = auth.currentUser;
-  auth.currentUser = { uid: "non-owner-uid" }; // This will simulate a different user viewing the post
+  auth.currentUser = { uid: mockUser.uid };
 
-  // Mock Firestore document fetch for the non-owner's profile
+  // Mock Firestore fetch for the user's profile
   getDoc.mockResolvedValueOnce({
     exists: () => true,
-    data: () => mockNonOwnerUser,
+    data: () => mockUser,
   });
+
+  // Mock alert for purchase confirmation
+  window.alert = jest.fn();
 
   // Render the component
   render(
@@ -198,19 +210,25 @@ test("renders purchase button for non-owners and triggers purchase action", asyn
     </MemoryRouter>
   );
 
-  // Wait for posting data
-  await waitFor(() => screen.getByText(mockPosting.postingName));
+  // Wait for the posting data to appear
+  await waitFor(() => screen.getByText(mockPostingNonOwner.postingName));
 
-  // Check if "Purchase" button is visible for non-owners instead of the "Edit" button
-  const purchaseButton = screen.getByRole("button", { name: /Edit/i });
+  // Ensure the "Purchase" button is displayed
+  const purchaseButton = screen.getByRole("button", { name: /Purchase/i });
   expect(purchaseButton).toBeInTheDocument();
 
-  // Simulate click on "Purchase" button
+  // Ensure the "Edit" button is not displayed
+  expect(screen.queryByRole("button", { name: /Edit/i })).not.toBeInTheDocument();
+
+  // Simulate clicking the "Purchase" button
   fireEvent.click(purchaseButton);
 
-  // Check if the purchase alert is triggered with the correct message
-  expect(window.alert).toHaveBeenCalledWith(`You have purchased: ${mockPosting.postingName}`);
+  // Check for the correct alert message
+  expect(window.alert).toHaveBeenCalledWith(
+    `You have purchased: ${mockPostingNonOwner.postingName}`
+  );
 
-  // Restore the original auth.currentUser mock
+  // Restore original auth.currentUser
   auth.currentUser = originalAuthCurrentUser;
 });
+
