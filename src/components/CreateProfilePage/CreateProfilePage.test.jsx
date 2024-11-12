@@ -259,3 +259,124 @@ test("first name and last name fields are marked as required", () => {
   expect(lastNameInput).toBeRequired();
   expect(bioInput).toBeRequired();
 });
+
+
+test("throws error when user is not authenticated", async () => {
+  auth.currentUser = null; // Mock unauthenticated state
+
+  render(
+    <MemoryRouter>
+      <CreateProfilePage />
+    </MemoryRouter>
+  );
+
+  const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+  await userEvent.click(submitButton);
+
+  // Expect an error to be thrown and logged in the console
+  expect(console.error).toHaveBeenCalledWith(expect.stringContaining("User not authenticated"));
+});
+
+test("uploads profile image and retrieves download URL", async () => {
+  const mockFile = new File(["dummy content"], "example.png", {
+    type: "image/png",
+  });
+
+  const mockDownloadURL = "https://fake-url.com/example.png";
+  uploadBytes.mockResolvedValueOnce(); // Mock successful upload
+  getDownloadURL.mockResolvedValueOnce(mockDownloadURL); // Mock successful URL retrieval
+
+  render(
+    <MemoryRouter>
+      <CreateProfilePage />
+    </MemoryRouter>
+  );
+
+  const profileImageInput = screen.getByLabelText(/Profile Picture/i);
+  fireEvent.change(profileImageInput, { target: { files: [mockFile] } });
+
+  const firstNameInput = screen.getByLabelText(/First Name/i);
+  fireEvent.change(firstNameInput, { target: { value: "John" } });
+
+  const lastNameInput = screen.getByLabelText(/Last Name/i);
+  fireEvent.change(lastNameInput, { target: { value: "Doe" } });
+
+  const bioTextarea = screen.getByLabelText(/Bio/i);
+  fireEvent.change(bioTextarea, { target: { value: "This is a bio" } });
+
+  const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+  await userEvent.click(submitButton);
+
+  // Verify uploadBytes and getDownloadURL are called
+  expect(uploadBytes).toHaveBeenCalled();
+  expect(getDownloadURL).toHaveBeenCalled();
+  expect(setDoc).toHaveBeenCalledWith(
+    expect.any(Object),
+    expect.objectContaining({
+      profileImageUrl: mockDownloadURL,
+    })
+  );
+});
+
+test("sets profileImageUrl to null if no image is uploaded", async () => {
+  render(
+    <MemoryRouter>
+      <CreateProfilePage />
+    </MemoryRouter>
+  );
+
+  const firstNameInput = screen.getByLabelText(/First Name/i);
+  fireEvent.change(firstNameInput, { target: { value: "Jane" } });
+
+  const lastNameInput = screen.getByLabelText(/Last Name/i);
+  fireEvent.change(lastNameInput, { target: { value: "Doe" } });
+
+  const bioTextarea = screen.getByLabelText(/Bio/i);
+  fireEvent.change(bioTextarea, { target: { value: "This is another bio" } });
+
+  const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+  await userEvent.click(submitButton);
+
+  // Verify profileImageUrl is null
+  expect(setDoc).toHaveBeenCalledWith(
+    expect.any(Object),
+    expect.objectContaining({
+      profileImageUrl: null,
+    })
+  );
+});
+
+test("navigates to /posting-list on successful form submission", async () => {
+  const mockFile = new File(["dummy content"], "example.png", {
+    type: "image/png",
+  });
+
+  const mockDownloadURL = "https://fake-url.com/example.png";
+  uploadBytes.mockResolvedValueOnce(); // Mock successful upload
+  getDownloadURL.mockResolvedValueOnce(mockDownloadURL); // Mock successful URL retrieval
+
+  render(
+    <MemoryRouter>
+      <CreateProfilePage />
+    </MemoryRouter>
+  );
+
+  const profileImageInput = screen.getByLabelText(/Profile Picture/i);
+  fireEvent.change(profileImageInput, { target: { files: [mockFile] } });
+
+  const firstNameInput = screen.getByLabelText(/First Name/i);
+  fireEvent.change(firstNameInput, { target: { value: "John" } });
+
+  const lastNameInput = screen.getByLabelText(/Last Name/i);
+  fireEvent.change(lastNameInput, { target: { value: "Doe" } });
+
+  const bioTextarea = screen.getByLabelText(/Bio/i);
+  fireEvent.change(bioTextarea, { target: { value: "This is a bio" } });
+
+  const submitButton = screen.getByRole("button", { name: /Create Profile/i });
+  await userEvent.click(submitButton);
+
+  await waitFor(() => {
+    expect(mockedUsedNavigate).toHaveBeenCalledWith("/posting-list");
+  });
+});
