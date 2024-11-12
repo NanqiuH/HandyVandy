@@ -1,5 +1,5 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import ProfileViewPage from "./ProfileViewPage";
 import { getDoc, getDocs, doc, collection, query, where } from "firebase/firestore";
 import { auth } from "../../__mocks__/firebase"; // Imports the mock functions (see __mock__/firebase.js)
@@ -60,6 +60,7 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockedUsedNavigate,
 }));
+
 
 window.alert = jest.fn();
 
@@ -125,5 +126,84 @@ test("renders profile view page", async () => {
   expect(screen.getByAltText(`${mockUser.firstName} ${mockUser.lastName}`)).toBeInTheDocument();
 
   // Restore original auth.currentUser
+  auth.currentUser = originalAuthCurrentUser;
+});
+
+test("navigates to review creation page when clicking 'Leave a Review' button", async () => {
+  // Mock the Firestore document reference (profileRef) for the user profile
+  const mockDocRef = { id: "123" };
+
+  // Mock Firestore doc function to return the mock reference
+  doc.mockReturnValue(mockDocRef);
+
+  // Mock Firestore document snapshot (profileSnap)
+  const mockProfileSnap = {
+    exists: jest.fn().mockReturnValue(true),  // Mock exists method to return true
+    data: jest.fn().mockReturnValue({
+      firstName: "John",
+      middleName: "Doe",
+      lastName: "Smith",
+      bio: "This is a sample bio.",
+      profileImageUrl: "sample-image-url",
+      rating: 4.5,
+      posts: [{ id: "1", title: "Sample Post", price: 10 }],
+    }),  // Mock data method to return the mock user
+    id: "123",  // Mock user ID
+    ref: mockDocRef,  // Mock the reference for the document
+  };
+
+  // Mock Firestore getDoc function to return the mock profile snapshot
+  getDoc.mockReturnValue(mockProfileSnap);
+
+  // Mock the reviews data
+  const mockReviewData = [{ id: "1", text: "Great profile!", rating: 5 }];
+  const mockReviewsSnapshot = {
+    docs: mockReviewData.map(data => ({
+      data: jest.fn().mockReturnValue(data),  // Mock the data method to return review data
+    })),
+  };
+
+  // Mock the getDocs function to resolve with the mock reviews snapshot
+  getDocs.mockResolvedValueOnce(mockReviewsSnapshot);
+
+  // Mock Firebase auth currentUser
+  const originalAuthCurrentUser = auth.currentUser;
+  auth.currentUser = { uid: "you" };
+
+  // Render the ProfileViewPage component
+  render(
+    <MemoryRouter
+      initialEntries={["/profile/123"]}
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <Routes>
+        <Route path="/profile/:id" element={<ProfileViewPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  // Check if the profile details are rendered
+  await waitFor(() =>
+    screen.getByText("John Doe Smith")  // Check that full name is rendered
+  );
+  expect(screen.getByText("This is a sample bio.")).toBeInTheDocument();  // Check if bio is displayed
+
+  // Check if 'Leave a Review' button is present
+  const leaveReviewButton = screen.getByText("Leave a Review");
+  expect(leaveReviewButton).toBeInTheDocument();
+
+  // Mock the navigate function and simulate clicking the 'Leave a Review' button
+  fireEvent.click(leaveReviewButton);
+
+  // Check if navigation occurred to the correct review page
+  expect(mockedUsedNavigate).toHaveBeenCalledWith("/review/123", {
+    state: { revieweeId: "123", revieweeName: "John Smith" },
+  });
+  mockedUsedNavigate.mockRestore();
+
+  // Restore the original auth.currentUser
   auth.currentUser = originalAuthCurrentUser;
 });
