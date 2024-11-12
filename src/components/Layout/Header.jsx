@@ -23,11 +23,11 @@ const Header = () => {
       </Button>
       {user ? (
         <nav className={styles.nav}>
-          <Button variant="contained" color="inherit" onClick={() => navigate('/search-post-nearby')}><img src={location}></img></Button>
-          <Button variant="contained" color="inherit" onClick={() => navigate('/chat/:id')}><img src={message}></img></Button>
-          <Button variant="contained" color="inherit" onClick={() => navigate('/posting-list')}><img src={category}></img></Button>
-          <Button variant="contained" color="inherit" onClick={() => navigate('/create-posting')}><img src={createPost}></img></Button>
-          <Button variant="contained" color="inherit" onClick={() => navigate('/profile-list')}><img src={usericon}></img></Button>
+          <Button variant="contained" color="inherit" onClick={() => navigate('/search-post-nearby')}><img alt="location" src={location}></img></Button>
+          <Button variant="contained" color="inherit" onClick={() => navigate('/chat/:id')}><img alt="chat" src={message}></img></Button>
+          <Button variant="contained" color="inherit" onClick={() => navigate('/posting-list')}><img alt="category" src={category}></img></Button>
+          <Button variant="contained" color="inherit" onClick={() => navigate('/create-posting')}><img alt="createPost" src={createPost}></img></Button>
+          <Button variant="contained" color="inherit" onClick={() => navigate('/profile-list')}><img alt="usericon" src={usericon}></img></Button>
           <Button variant="contained" color="inherit" onClick={() => { logout(); navigate('/'); }}>Sign Out</Button>
           <img
             src={profileImage}

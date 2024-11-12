@@ -27,58 +27,34 @@ function ReviewPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (formData.comment.trim() === "") {
-      setCommentError(true);
-      return;
+  if (formData.comment.trim() === "") {
+    setCommentError(true);
+    return;
+  }
+
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("User not authenticated");
     }
 
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
+    const timestamp = new Date().toISOString();
+    await addDoc(collection(db, "reviews"), {
+      rating: parseInt(formData.rating), // Ensure rating is an integer
+      comment: formData.comment,
+      reviewerUID: user.uid,
+      revieweeId,
+      revieweeName,
+      createdAt: timestamp,
+    });
+    // ...
+  } catch (error) {
+    console.error("Error adding review or updating profile: ", error);
+  }
+};
 
-      const timestamp = new Date().toISOString();
-      await addDoc(collection(db, "reviews"), {
-        rating: formData.rating,
-        comment: formData.comment,
-        reviewerUID: user.uid,
-        revieweeId,
-        revieweeName,
-        createdAt: timestamp,
-      });
-
-      // Fetch reviewee's profile data
-      const revieweeRef = doc(db, "profiles", revieweeId);
-      const revieweeSnapshot = await getDoc(revieweeRef);
-
-      if (revieweeSnapshot.exists()) {
-        const revieweeData = revieweeSnapshot.data();
-        const currentRating = revieweeData.rating || 0;
-        const currentNumRatings = revieweeData.numRatings || 0;
-
-        // Calculate the new rating
-        const newNumRatings = currentNumRatings + 1;
-        const newRating =
-          (currentRating * currentNumRatings + parseInt(formData.rating)) /
-          newNumRatings;
-
-        // Update the reviewee's profile with the new rating and numRatings
-        await updateDoc(revieweeRef, {
-          rating: newRating,
-          numRatings: newNumRatings,
-        });
-
-        navigate(`/profile/${revieweeId}`);
-      } else {
-        throw new Error("Reviewee profile not found");
-      }
-    } catch (error) {
-      console.error("Error adding review or updating profile: ", error);
-    }
-  };
 
   return (
     <div>
