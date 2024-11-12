@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import styles from "./CreateProfilePage.module.css";
 import Header from "../Layout/Header"
+import handleSubmit from "./handleSubmit";
 import { db } from "../../firebase";
 import { auth } from "../../firebase";
 import { storage } from "../../firebase";
@@ -36,39 +37,39 @@ function CreateProfilePage() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const user = auth.currentUser;
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const user = auth.currentUser;
 
-      if (!user || !user.uid) {
-        throw new Error("User not authenticated");
-      }
+  //     if (!user || !user.uid) {
+  //       throw new Error("User not authenticated");
+  //     }
 
-      let profileImageUrl = null;
-      if (formData.profileImage) {
-        const storageRef = ref(storage, `profileImages/${formData.profileImage.name}`);
-        await uploadBytes(storageRef, formData.profileImage);
-        profileImageUrl = await getDownloadURL(storageRef);
-      }
+  //     let profileImageUrl = null;
+  //     if (formData.profileImage) {
+  //       const storageRef = ref(storage, `profileImages/${formData.profileImage.name}`);
+  //       await uploadBytes(storageRef, formData.profileImage);
+  //       profileImageUrl = await getDownloadURL(storageRef);
+  //     }
 
-      const profileDocRef = doc(db, "profiles", user.uid);
+  //     const profileDocRef = doc(db, "profiles", user.uid);
 
-      await setDoc(profileDocRef, {
-        firstName: formData.firstName,
-        middleName: formData.middleName,
-        lastName: formData.lastName,
-        bio: formData.bio,
-        profileImageUrl: profileImageUrl,
-        rating: formData.rating,
-        numRatings: formData.numRatings,
-      });
-      navigate("/posting-list");
+  //     await setDoc(profileDocRef, {
+  //       firstName: formData.firstName,
+  //       middleName: formData.middleName,
+  //       lastName: formData.lastName,
+  //       bio: formData.bio,
+  //       profileImageUrl: profileImageUrl,
+  //       rating: formData.rating,
+  //       numRatings: formData.numRatings,
+  //     });
+  //     navigate("/posting-list");
 
-    } catch (error) {
-      console.error("Error adding document: ", error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error("Error adding document: ", error);
+  //   }
+  // };
 
   return (
     <div>
@@ -81,7 +82,7 @@ function CreateProfilePage() {
                 <header className={styles.header}>
                   <h1 className={styles.title}>Create Your Profile</h1>
                 </header>
-                <form onSubmit={handleSubmit} className={styles.form}>
+                <form onSubmit={(e) => handleSubmit(e, formData, navigate)} className={styles.form}>
                   <div className={styles.inputGroup}>
                     <label htmlFor="firstName" className={styles.label}>
                       First Name
