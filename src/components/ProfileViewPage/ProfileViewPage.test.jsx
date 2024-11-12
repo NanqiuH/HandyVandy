@@ -230,5 +230,186 @@ test("displays error message when profile does not exist", async () => {
   expect(screen.getByText("Failed to load profile.")).toBeInTheDocument();
 });
 
+test("allows profile editing when user is the owner", async () => {
+    // Mock the Firestore document reference (profileRef) for the user profile
+    const mockDocRef = { id: "123" };
+  
+    // Mock Firestore doc function to return the mock reference
+    doc.mockReturnValue(mockDocRef);
+  
+    // Mock Firestore document snapshot (profileSnap)
+    const mockProfileSnap = {
+      exists: jest.fn().mockReturnValue(true),  // Mock exists method to return true
+      data: jest.fn().mockReturnValue({
+        firstName: "John",
+        middleName: "Doe",
+        lastName: "Smith",
+        bio: "This is a sample bio.",
+        profileImageUrl: "sample-image-url",
+        rating: 4.5,
+        posts: [{ id: "1", title: "Sample Post", price: 10 }],
+      }),  // Mock data method to return the mock user
+      id: "123",  // Mock user ID
+      ref: mockDocRef,  // Mock the reference for the document
+    };
+  
+    // Mock Firestore getDoc function to return the mock profile snapshot
+    getDoc.mockReturnValue(mockProfileSnap);
+  
+    // Mock the reviews data
+    const mockReviewData = [{ id: "1", text: "Great profile!", rating: 5 }];
+    const mockReviewsSnapshot = {
+      docs: mockReviewData.map(data => ({
+        data: jest.fn().mockReturnValue(data),  // Mock the data method to return review data
+      })),
+    };
+  
+    // Mock the getDocs function to resolve with the mock reviews snapshot
+    getDocs.mockResolvedValueOnce(mockReviewsSnapshot);
+  
+    // Mock Firebase auth currentUser
+    const originalAuthCurrentUser = auth.currentUser;
+    auth.currentUser = { uid: "123" };
+  
+    // Render the ProfileViewPage component
+    render(
+      <MemoryRouter
+        initialEntries={["/profile/123"]}
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        <Routes>
+          <Route path="/profile/:id" element={<ProfileViewPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    // Check if the profile details are rendered
+    await waitFor(() =>
+      screen.getByText("John Doe Smith")  // Check that full name is rendered
+    );
+    expect(screen.getByText("This is a sample bio.")).toBeInTheDocument();  // Check if bio is displayed
+  
+    // Check if 'Leave a Review' button is present
+    const editButton = screen.getByText("Edit Profile");
+    expect(editButton).toBeInTheDocument();
+  
+    fireEvent.click(editButton);
+  
+    expect(mockedUsedNavigate).toHaveBeenCalledWith("/edit/123", {
+      state: { revieweeId: "123", revieweeName: "John Smith" },
+    });
+    mockedUsedNavigate.mockRestore();
+  
+    // Restore the original auth.currentUser
+    auth.currentUser = originalAuthCurrentUser;
+  });
 
 
+test("prevents profile editing for non-owners", async () => {
+    getDoc.mockResolvedValueOnce({
+      exists: jest.fn().mockReturnValue(true),
+      data: jest.fn().mockReturnValue(mockUser),
+    });
+  
+    auth.currentUser = { uid: "non-owner-id" }; // Set the current user to someone else
+  
+    render(
+      <MemoryRouter initialEntries={[`/profile/${mockUser.uid}`]}>
+        <Routes>
+          <Route path="/profile/:id" element={<ProfileViewPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    await waitFor(() =>
+      screen.getByText(`${mockUser.firstName} ${mockUser.middleName} ${mockUser.lastName}`)
+    );
+  
+    const editButton = screen.getByText("Edit Profile");
+    fireEvent.click(editButton);
+  
+    expect(window.alert).toHaveBeenCalledWith("You can only edit your own profile.");
+  });
+  
+test("renders reviews with correct data", async () => {
+    getDoc.mockResolvedValueOnce({
+      exists: jest.fn().mockReturnValue(true),
+      data: jest.fn().mockReturnValue(mockUser),
+    });
+  
+    const mockReviewData = [
+      { id: "1", rating: 5, comment: "Excellent!", createdAt: new Date().toISOString(), reviewerName: "Alice" },
+      { id: "2", rating: 4, comment: "Good job!", createdAt: new Date().toISOString(), reviewerName: "Bob" },
+    ];
+  
+    getDocs.mockResolvedValueOnce({
+      docs: mockReviewData.map((review) => ({
+        id: review.id,
+        data: () => review,
+      })),
+    });
+  
+    render(
+      <MemoryRouter initialEntries={[`/profile/${mockUser.uid}`]}>
+        <Routes>
+          <Route path="/profile/:id" element={<ProfileViewPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    await waitFor(() => screen.getByText("Excellent!"));
+    expect(screen.getByText("Good job!")).toBeInTheDocument();
+    expect(screen.getByText("Posted by: User Alice")).toBeInTheDocument();
+    expect(screen.getByText("Posted by: User Bob")).toBeInTheDocument();
+  });
+  
+test("renders 'Send Message' and 'Leave a Review' buttons for non-owners", async () => {
+    getDoc.mockResolvedValueOnce({
+      exists: jest.fn().mockReturnValue(true),
+      data: jest.fn().mockReturnValue(mockUser),
+    });
+  
+    auth.currentUser = { uid: "non-owner-id" }; // Set current user to a non-owner
+  
+    render(
+      <MemoryRouter initialEntries={[`/profile/${mockUser.uid}`]}>
+        <Routes>
+          <Route path="/profile/:id" element={<ProfileViewPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    await waitFor(() =>
+      screen.getByText(`${mockUser.firstName} ${mockUser.middleName} ${mockUser.lastName}`)
+    );
+  
+    expect(screen.getByText("Send Message")).toBeInTheDocument();
+    expect(screen.getByText("Leave a Review")).toBeInTheDocument();
+  });
+
+test("renders 'Edit Profile' button for owners only", async () => {
+    getDoc.mockResolvedValueOnce({
+      exists: jest.fn().mockReturnValue(true),
+      data: jest.fn().mockReturnValue(mockUser),
+    });
+  
+    auth.currentUser = { uid: mockUser.uid }; // Set current user as the owner
+  
+    render(
+      <MemoryRouter initialEntries={[`/profile/${mockUser.uid}`]}>
+        <Routes>
+          <Route path="/profile/:id" element={<ProfileViewPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    await waitFor(() =>
+      screen.getByText(`${mockUser.firstName} ${mockUser.middleName} ${mockUser.lastName}`)
+    );
+  
+    expect(screen.getByText("Edit Profile")).toBeInTheDocument();
+  });
+  
