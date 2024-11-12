@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./ProfileViewPage.module.css";
 import Header from "../Layout/Header";
 import anonProfile from "../../images/anon_profile.png";
+import { PestControlSharp } from "@mui/icons-material";
 
 function ProfileViewPage() {
   const { id } = useParams();
