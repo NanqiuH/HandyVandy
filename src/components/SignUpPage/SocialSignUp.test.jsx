@@ -17,11 +17,12 @@ describe('SocialSignUp Component', () => {
     render(<SocialSignUp />);
     
     // Check if the Google icon image is displayed with correct src and class
-    const googleIcon = screen.getByRole('img', { hidden: true });
+    const googleIcon = screen.getByAltText('');
     expect(googleIcon).toBeInTheDocument();
     expect(googleIcon).toHaveAttribute('src', 'google.png');
     expect(googleIcon).toHaveClass('googleIcon');
   });
+  
 
   test('renders text "SignUp with Google"', () => {
     render(<SocialSignUp />);

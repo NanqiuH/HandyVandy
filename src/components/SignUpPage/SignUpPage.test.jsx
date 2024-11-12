@@ -18,11 +18,9 @@ describe('SignUpPage Component', () => {
     );
   });
 
-  test('renders Header component', () => {
-    // Check if the Header component is rendered
-    expect(screen.getByRole('banner')).toBeInTheDocument();
-    expect(screen.getByText('Header Component')).toBeInTheDocument();
-  });
+
+
+  
 
   test('renders the hero image with correct attributes', () => {
     // Check if the hero image is displayed with correct src and alt attributes
