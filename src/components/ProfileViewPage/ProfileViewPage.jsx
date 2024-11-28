@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs, updateDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db, storage, auth } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./ProfileViewPage.module.css";
@@ -26,6 +26,10 @@ function ProfileViewPage() {
     profileImage: null,
   });
   const [isOwner, setIsOwner] = useState(false);
+  const [friendRequestSent, setFriendRequestSent] = useState(false);
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [friendsList, setFriendsList] = useState([]);
+  const [requesterProfiles, setRequesterProfiles] = useState([]);
 
 
   useEffect(() => {
@@ -45,6 +49,81 @@ function ProfileViewPage() {
 
     fetchReceiverFullName();
   }, [receiverId]);
+
+  useEffect(() => {
+    const fetchProfileAndData = async () => {
+      try {
+        const profileRef = doc(db, "profiles", id);
+        const profileSnap = await getDoc(profileRef);
+
+        if (profileSnap.exists()) {
+          const profileData = profileSnap.data();
+          setProfile(profileData);
+          setFriendRequests(profileData.friendRequests || []);
+          setFriendsList(profileData.friends || []);
+
+          const reviewsQuery = query(
+            collection(db, "reviews"),
+            where("revieweeId", "==", id)
+          );
+          const reviewsSnapshot = await getDocs(reviewsQuery);
+          const fetchedReviews = reviewsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setReviews(fetchedReviews);
+
+          const currentUser = auth.currentUser;
+          setIsOwner(currentUser && currentUser.uid === id);
+          setFriendRequestSent(
+            profileData.friendRequests?.includes(currentUser.uid)
+          );
+
+          const requesterProfiles = await Promise.all(
+            (profileData.friendRequests || []).map(async (requesterId) => {
+              const requesterDoc = await getDoc(doc(db, "profiles", requesterId));
+              return requesterDoc.exists()
+                ? { id: requesterId, ...requesterDoc.data() }
+                : null;
+            })
+          );
+
+          setRequesterProfiles(requesterProfiles.filter((profile) => profile !== null));
+
+        } else {
+          setError("Profile not found.");
+        }
+      } catch (err) {
+        console.error("Error fetching profile or reviews:", err);
+        setError("Failed to load profile.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileAndData();
+  }, [id]);
+
+  const handleSendFriendRequest = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        alert("Please log in to send a friend request.");
+        return;
+      }
+
+      const currentUserId = currentUser.uid;
+      const profileRef = doc(db, "profiles", id);
+
+      await updateDoc(profileRef, {
+        friendRequests: arrayUnion(currentUserId),
+      });
+
+      setFriendRequestSent(true);
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
+  };
 
   const handleEditToggle = () => {
     if (isOwner) {
@@ -67,6 +146,52 @@ function ProfileViewPage() {
       ...prevData,
       profileImage: e.target.files[0],
     }));
+  };
+
+  const handleAcceptFriendRequest = async (requesterId) => {
+    try {
+      const profileRef = doc(db, "profiles", id);
+      await updateDoc(profileRef, {
+        friends: arrayUnion(requesterId),
+        friendRequests: arrayRemove(requesterId),
+      });
+
+      const requesterRef = doc(db, "profiles", requesterId);
+      await updateDoc(requesterRef, {
+        friends: arrayUnion(id),
+      });
+
+      setFriendRequests((prevRequests) =>
+        prevRequests.filter((request) => request !== requesterId)
+      );
+
+      setFriendsList((prevFriends) => [...prevFriends, requesterId]);
+      setRequesterProfiles((prevProfiles) =>
+        prevProfiles.filter((profile) => profile.id !== requesterId)
+      );
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+  };
+
+  const handleDeclineFriendRequest = async (requesterId) => {
+    try {
+      const profileRef = doc(db, "profiles", id);
+      await updateDoc(profileRef, {
+        friendRequests: arrayRemove(requesterId),
+      });
+
+      setFriendRequests((prevRequests) =>
+        prevRequests.filter((request) => request !== requesterId)
+      );
+
+      setRequesterProfiles((prevProfiles) =>
+        prevProfiles.filter((profile) => profile.id !== requesterId)
+      );
+
+    } catch (error) {
+      console.error("Error declining friend request:", error);
+    }
   };
 
   const handleSaveChanges = async (e) => {
@@ -142,6 +267,10 @@ function ProfileViewPage() {
     navigate(`/chat/${id}`);
   };
 
+  const handleViewFriendsList = () => {
+    navigate(`/friends/${id}`);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -152,6 +281,7 @@ function ProfileViewPage() {
 
   const profileImageUrl = profile.profileImageUrl || anonProfile;
   const starRating = "★".repeat(Math.round(profile.rating)) + "☆".repeat(5 - Math.round(profile.rating));
+  const isAlreadyFriends = friendsList.includes(auth.currentUser?.uid);
 
   return (
     <div>
@@ -196,6 +326,42 @@ function ProfileViewPage() {
                 {isEditing ? "Cancel" : "Edit Profile"}
               </button>
             )}
+            {isOwner && (
+              <button
+                onClick={handleViewFriendsList}
+                className={styles.viewFriendsButton}
+              >
+                View Friends
+              </button>
+            )}
+            {isOwner && requesterProfiles.length > 0 && (
+              <>
+                <h3>Friend Requests</h3>
+                <ul className={styles.friendRequestsList}>
+                  {requesterProfiles.map((requester) => (
+                    <li key={requester.id} className={styles.requesterItem}>
+                      <div className={styles.requesterDetails}>
+                        <h4>{`${requester.firstName} ${requester.lastName}`}</h4>
+                        <div className={styles.requesterActions}>
+                          <button
+                            onClick={() => handleAcceptFriendRequest(requester.id)}
+                            className={styles.acceptButton}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => handleDeclineFriendRequest(requester.id)}
+                            className={styles.declineButton}
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </header>
 
           <div className={styles.profileContent}>
@@ -222,7 +388,17 @@ function ProfileViewPage() {
                 </div>
                 {!isOwner && (
                   <>
-                    <button className={styles.friendButton}>Send Friend Request</button>
+                    {isAlreadyFriends ? (
+                      <p className={styles.alreadyFriends}>You are already friends.</p>
+                    ) : (
+                    <button
+                      onClick={handleSendFriendRequest} 
+                      className={styles.friendButton}
+                      disabled={friendRequestSent}
+                    >
+                      {friendRequestSent ? "Request Sent" : "Send Friend Request"}
+                    </button>
+                    )}
                     <button className={styles.messageButton} onClick={() => navigate(`/chat/${id}`)}>
                       Send Message
                     </button>

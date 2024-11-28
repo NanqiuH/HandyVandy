@@ -1,0 +1,102 @@
+.friendsListPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #D9D1CF; /* Match the background color */
+    padding: 20px;
+  }
+  
+  .container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+    margin-top: -220px; /* Adjusted for alignment */
+  }
+  
+  .header {
+    margin-bottom: 0px;
+  }
+  
+  .title {
+    font-size: 36px;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+    margin-top: 200px;
+  }
+  
+  .friendsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .friendCard {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 250px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .friendImage {
+    width: 250px;
+    height: 250px;
+    border-radius: 0%;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  
+  .friendDetails {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .friendName {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .friendBio {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .friendLink {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .searchBar {
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    font-size: 18px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .searchBar:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  

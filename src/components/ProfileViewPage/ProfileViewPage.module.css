@@ -219,3 +219,16 @@
   box-sizing: border-box;
   transition: border-color 0.3s ease;
 }
+
+.viewFriendsButton {
+  background-color: #C5B783;
+  color: #000;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.viewFriendsButton:hover {
+  background-color: #B59B5A; 
+}
