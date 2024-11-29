@@ -8,6 +8,9 @@ import styles from "./SinglePostViewPage.module.css";
 import HandyVandyLogo from "../../images/HandyVandyV.png";
 import ServiceOptions from "../../options/ServiceOptions";
 import CategoryOptions from "../../options/CategoryOptions";
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 function SinglePostingPage() {
   const { id } = useParams();
@@ -148,8 +151,28 @@ function SinglePostingPage() {
     }
   };
 
-  const handlePurchase = () => {
-    alert(`You have purchased: ${posting.postingName}`);
+  const handlePurchase = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ posting }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const session = await response.json();
+      const stripe = await stripePromise;
+      await stripe.redirectToCheckout({ sessionId: session.id });
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      alert('Failed to initiate checkout.');
+    }
+    // alert(`You have purchased: ${posting.postingName}`);
   };
 
   const handleMessage = () => {
