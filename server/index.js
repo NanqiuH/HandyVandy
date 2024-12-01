@@ -10,7 +10,15 @@ const PORT = 5000;
 const allowedOrigin = process.env.ALLOWED_ORIGIN;
 
 app.use(bodyParser.json());
-app.use(cors({ origin: allowedOrigin }));
+app.use(cors({
+    origin: function (origin, callback) {
+      if (!origin || origin === allowedOrigin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  }));
 
 // Route for the root URL
 app.get('/', (req, res) => {
