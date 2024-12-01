@@ -153,7 +153,7 @@ function SinglePostingPage() {
 
   const handlePurchase = async () => {
     try {
-      const response = await fetch('http://localhost:3001/create-checkout-session', {
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
