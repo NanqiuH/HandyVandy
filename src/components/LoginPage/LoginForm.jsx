@@ -8,6 +8,7 @@ import KeyIcon from '@mui/icons-material/Key';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 function LoginForm() {
   const [email, setEmail] = React.useState('');
@@ -26,6 +27,19 @@ function LoginForm() {
           alert('Login failed. Please check your email and password.');
       }
   }
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      alert('Please enter your email address.');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert('Password reset email sent! Check your inbox.');
+    } catch (error) {
+      alert('Error sending password reset email. Please try again.');
+    }
+  };
 
   return (
     <form className={styles.loginForm}>
@@ -60,9 +74,13 @@ function LoginForm() {
           <input type="checkbox" className={styles.checkbox} />
           <span>Remember me</span>
         </label>
-        <a href="#" className={styles.forgotPassword}>
-          Forgot Password?
-        </a>
+        <span 
+         className={styles.forgotPassword} 
+         onClick={handlePasswordReset}
+         role="button"
+        >
+         Forgot Password?
+        </span>
       </div>
       <button type="submit" className={styles.loginButton} onClick={handleSubmit}>
         Login

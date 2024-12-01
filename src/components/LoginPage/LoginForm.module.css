@@ -71,8 +71,9 @@
 }
 
 .forgotPassword {
-  color: #C5B783;
-  text-decoration: none;
+  cursor: pointer;
+  text-decoration: underline;
+  color: #C5B783; /* Use the same color code as "Remember me" */
 }
 
 .loginButton {
