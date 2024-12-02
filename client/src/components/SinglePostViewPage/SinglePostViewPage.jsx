@@ -200,7 +200,7 @@ function SinglePostingPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ posting }),
+          body: JSON.stringify({ postingName: posting.postingName, price: posting.price }),
         }
       );
 

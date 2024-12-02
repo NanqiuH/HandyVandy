@@ -26,7 +26,11 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/create-checkout-session', async (req, res) => {
-  const { posting } = req.body;
+  const { postingName, price } = req.body; // Destructure postingName and price from the request body
+
+    if (!postingName || !price) {
+      return res.status(400).json({ error: "postingName and price are required" });
+    }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -36,9 +40,9 @@ app.post('/api/create-checkout-session', async (req, res) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: posting.postingName,
+              name: postingName,
             },
-            unit_amount: posting.price * 100, // amount in cents
+            unit_amount: price * 100, // amount in cents
           },
           quantity: 1,
         },
