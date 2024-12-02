@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
 import { db, storage, auth } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./ProfileViewPage.module.css";
@@ -15,7 +25,7 @@ function ProfileViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [receiverFullName, setReceiverFullName] = useState('');
+  const [receiverFullName, setReceiverFullName] = useState("");
   const { id: receiverId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [updatedData, setUpdatedData] = useState({
@@ -31,11 +41,10 @@ function ProfileViewPage() {
   const [friendsList, setFriendsList] = useState([]);
   const [requesterProfiles, setRequesterProfiles] = useState([]);
 
-
   useEffect(() => {
     const fetchReceiverFullName = async () => {
       try {
-        const userDocRef = doc(db, 'profiles', receiverId);
+        const userDocRef = doc(db, "profiles", receiverId);
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
@@ -81,15 +90,18 @@ function ProfileViewPage() {
 
           const requesterProfiles = await Promise.all(
             (profileData.friendRequests || []).map(async (requesterId) => {
-              const requesterDoc = await getDoc(doc(db, "profiles", requesterId));
+              const requesterDoc = await getDoc(
+                doc(db, "profiles", requesterId)
+              );
               return requesterDoc.exists()
                 ? { id: requesterId, ...requesterDoc.data() }
                 : null;
             })
           );
 
-          setRequesterProfiles(requesterProfiles.filter((profile) => profile !== null));
-
+          setRequesterProfiles(
+            requesterProfiles.filter((profile) => profile !== null)
+          );
         } else {
           setError("Profile not found.");
         }
@@ -188,7 +200,6 @@ function ProfileViewPage() {
       setRequesterProfiles((prevProfiles) =>
         prevProfiles.filter((profile) => profile.id !== requesterId)
       );
-
     } catch (error) {
       console.error("Error declining friend request:", error);
     }
@@ -201,7 +212,10 @@ function ProfileViewPage() {
       let profileImageUrl = profile.profileImageUrl;
 
       if (updatedData.profileImage) {
-        const imageRef = ref(storage, `profileImages/${updatedData.profileImage.name}`);
+        const imageRef = ref(
+          storage,
+          `profileImages/${updatedData.profileImage.name}`
+        );
         await uploadBytes(imageRef, updatedData.profileImage);
         profileImageUrl = await getDownloadURL(imageRef);
       }
@@ -244,7 +258,9 @@ function ProfileViewPage() {
             ...doc.data(),
           }));
 
-          fetchedReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          fetchedReviews.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
           setReviews(fetchedReviews);
 
           const currentUser = auth.currentUser;
@@ -280,7 +296,9 @@ function ProfileViewPage() {
   }
 
   const profileImageUrl = profile.profileImageUrl || anonProfile;
-  const starRating = "★".repeat(Math.round(profile.rating)) + "☆".repeat(5 - Math.round(profile.rating));
+  const starRating =
+    "★".repeat(Math.round(profile.rating)) +
+    "☆".repeat(5 - Math.round(profile.rating));
   const isAlreadyFriends = friendsList.includes(auth.currentUser?.uid);
 
   return (
@@ -344,13 +362,17 @@ function ProfileViewPage() {
                         <h4>{`${requester.firstName} ${requester.lastName}`}</h4>
                         <div className={styles.requesterActions}>
                           <button
-                            onClick={() => handleAcceptFriendRequest(requester.id)}
+                            onClick={() =>
+                              handleAcceptFriendRequest(requester.id)
+                            }
                             className={styles.acceptButton}
                           >
                             Accept
                           </button>
                           <button
-                            onClick={() => handleDeclineFriendRequest(requester.id)}
+                            onClick={() =>
+                              handleDeclineFriendRequest(requester.id)
+                            }
                             className={styles.declineButton}
                           >
                             Decline
@@ -389,24 +411,34 @@ function ProfileViewPage() {
                 {!isOwner && (
                   <>
                     {isAlreadyFriends ? (
-                      <p className={styles.alreadyFriends}>You are already friends.</p>
+                      <p className={styles.alreadyFriends}>
+                        You are already friends.
+                      </p>
                     ) : (
-                    <button
-                      onClick={handleSendFriendRequest} 
-                      className={styles.friendButton}
-                      disabled={friendRequestSent}
-                    >
-                      {friendRequestSent ? "Request Sent" : "Send Friend Request"}
-                    </button>
+                      <button
+                        onClick={handleSendFriendRequest}
+                        className={styles.friendButton}
+                        disabled={friendRequestSent}
+                      >
+                        {friendRequestSent
+                          ? "Request Sent"
+                          : "Send Friend Request"}
+                      </button>
                     )}
-                    <button className={styles.messageButton} onClick={() => navigate(`/chat/${id}`)}>
+                    <button
+                      className={styles.messageButton}
+                      onClick={() => navigate(`/chat/${id}`)}
+                    >
                       Send Message
                     </button>
                     <button
                       className={styles.reviewButton}
                       onClick={() =>
                         navigate(`/review/${id}`, {
-                          state: { revieweeId: id, revieweeName: `${profile.firstName} ${profile.lastName}` },
+                          state: {
+                            revieweeId: id,
+                            revieweeName: `${profile.firstName} ${profile.lastName}`,
+                          },
                         })
                       }
                     >
@@ -429,7 +461,7 @@ function ProfileViewPage() {
               ) : (
                 <p className={styles.bio}>{profile.bio}</p>
               )}
-              
+
               <h3 className={styles.postsTitle}>Posts</h3>
               {profile.posts && profile.posts.length > 0 ? (
                 <ul className={styles.postsList}>
@@ -442,7 +474,7 @@ function ProfileViewPage() {
               ) : (
                 <p>No posts available.</p>
               )}
-              
+
               <h3 className={styles.reviewsTitle}>Reviews</h3>
               {reviews.length > 0 ? (
                 <ul className={styles.reviewsList}>
@@ -450,10 +482,13 @@ function ProfileViewPage() {
                     <li key={review.id} className={styles.reviewItem}>
                       <div className={styles.reviewContent}>
                         <p className={styles.reviewRating}>
-                          { "★".repeat(Math.round(review.rating)) + "☆".repeat(5 - Math.round(review.rating)) }
+                          {"★".repeat(Math.round(review.rating)) +
+                            "☆".repeat(5 - Math.round(review.rating))}
                         </p>
                         <p className={styles.reviewComment}>{review.comment}</p>
-                        <p className={styles.reviewerName}>Posted by: {receiverFullName || 'User'} {review.reviewerName}</p>
+                        <p className={styles.reviewerName}>
+                          Posted by: {review.reviewerName || "Anonymous"}
+                        </p>
                       </div>
                       <p className={styles.reviewDate}>
                         {new Date(review.createdAt).toLocaleString()}
@@ -466,7 +501,10 @@ function ProfileViewPage() {
               )}
 
               {isEditing && (
-                <button onClick={handleSaveChanges} className={styles.saveButton}>
+                <button
+                  onClick={handleSaveChanges}
+                  className={styles.saveButton}
+                >
                   Save Changes
                 </button>
               )}
