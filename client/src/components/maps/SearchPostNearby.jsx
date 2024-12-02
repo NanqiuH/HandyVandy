@@ -22,6 +22,7 @@ import { fetchLocations } from "./fetchLocations";
 import { handleMapClick } from "./mapHandlers";
 import { saveLocation } from "./saveLocations";
 import { handleDeleteLocation } from "./handleDeleteLocation";
+import { useNavigate } from "react-router-dom";
 
 const SearchPostNearby = () => {
   const [markerLocation, setMarkerLocation] = useState({
@@ -34,6 +35,7 @@ const SearchPostNearby = () => {
   const [listOfLocations, setListOfLocations] = useState([]);
   const [userMarkerIcon, setUserMarkerIcon] = useState(null);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setUser(auth.currentUser);
@@ -59,34 +61,6 @@ const SearchPostNearby = () => {
     }
   }, []);
 
-  // const handleMapClick = async (mapProps) => {
-  //   if (mapProps.detail.placeId) {
-  //     const lat = mapProps.detail.latLng.lat;
-  //     const lng = mapProps.detail.latLng.lng;
-  //     try {
-  //       const locationName = await getLocationName(lat, lng);
-  //       setShowDialog(true);
-  //       setDialogLocation({ lat, lng });
-  //       if (user && user.uid) {
-  //         setSelectedLocation({
-  //           lat,
-  //           lng,
-  //           name: locationName,
-  //           userId: user.uid,
-  //         });
-  //       } else {
-  //         console.error("User is not defined or user.uid is not available");
-  //         alert("User information is not available. Please log in.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error getting location name:", error);
-  //       alert("Failed to get location name. Please try again.");
-  //     }
-  //   } else {
-  //     alert("Please select the specific location");
-  //   }
-  // };
-
   const saveLocations = async () => {
     await saveLocation(selectedLocation, setListOfLocations, setShowDialog);
   };
@@ -98,6 +72,14 @@ const SearchPostNearby = () => {
   const onViewLocation = (loc) => {
     setMarkerLocation({ lat: loc.lat, lng: loc.lng });
   };
+
+  const handleChatClick = (loc) => {
+    if(loc.userId === user.uid){
+      alert("You cannot chat with yourself");
+      return ;
+    }
+    navigate(`/chat/${loc.userId}`);
+  }
 
   return (
     <>
@@ -160,6 +142,12 @@ const SearchPostNearby = () => {
                         onClick={() => onViewLocation(loc)}
                       >
                         View
+                      </Button>
+                      <Button
+                        className={styles.viewButton}
+                        onClick={() => handleChatClick(loc)}
+                      >
+                        Chat with user
                       </Button>
                       {loc.userId === user?.uid && (
                         <Button
