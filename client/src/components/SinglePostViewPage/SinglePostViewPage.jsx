@@ -42,52 +42,52 @@ function SinglePostingPage() {
   const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
-    fetchPosting();
-  }, [id]);
-
-  const fetchPosting = async () => {
-    try {
-      const docRef = doc(db, "postings", id);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const postingData = docSnap.data();
-        setPosting(postingData);
-        setUpdatedData({
-          postingName: postingData.postingName,
-          description: postingData.description,
-          location: postingData.location,
-          price: postingData.price,
-          serviceType: postingData.serviceType,
-          category: postingData.category,
-          postingImage: null,
-        });
-
-        const currentUser = auth.currentUser;
-        setIsOwner(currentUser && currentUser.uid === postingData.postingUID);
-
-        if (postingData.postingUID) {
-          const userDocRef = doc(db, "profiles", postingData.postingUID);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            setUser(userDocSnap.data());
+    const fetchPosting = async () => {
+      try {
+        const docRef = doc(db, "postings", id);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          const postingData = docSnap.data();
+          setPosting(postingData);
+          setUpdatedData({
+            postingName: postingData.postingName,
+            description: postingData.description,
+            location: postingData.location,
+            price: postingData.price,
+            serviceType: postingData.serviceType,
+            category: postingData.category,
+            postingImage: null,
+          });
+  
+          const currentUser = auth.currentUser;
+          setIsOwner(currentUser && currentUser.uid === postingData.postingUID);
+  
+          if (postingData.postingUID) {
+            const userDocRef = doc(db, "profiles", postingData.postingUID);
+            const userDocSnap = await getDoc(userDocRef);
+  
+            if (userDocSnap.exists()) {
+              setUser(userDocSnap.data());
+            } else {
+              console.error("User not found for UID:", postingData.postingUID);
+            }
           } else {
-            console.error("User not found for UID:", postingData.postingUID);
+            console.error("postingUID not found in posting data.");
           }
         } else {
-          console.error("postingUID not found in posting data.");
+          setError("Posting not found.");
         }
-      } else {
-        setError("Posting not found.");
+      } catch (err) {
+        console.error("Error fetching posting:", err);
+        setError("Failed to load posting.");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching posting:", err);
-      setError("Failed to load posting.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchPosting();
+  }, [id]);
 
   const handleLocationChange = (e) => {
     setLocation(e.target.value);
@@ -165,7 +165,6 @@ function SinglePostingPage() {
         updatedAt: timestamp,
       });
       setIsEditing(false);
-      fetchPosting();
     } catch (error) {
       console.error("Error updating posting:", error);
       alert("Failed to update posting.");
@@ -189,6 +188,10 @@ function SinglePostingPage() {
   };
 
   const handlePurchase = async () => {
+    if(posting.serviceType === "requesting" || posting.serviceType === "requesting-with-delivery") {
+      handlePaymentSuccess(posting);
+      return ;
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_BASE_URL}/api/create-checkout-session`,
@@ -227,24 +230,28 @@ function SinglePostingPage() {
     try {
       // Add posting information to Firebase
       const order = {
-        postingId: posting.id,
-        postingName: posting.postingName,
-        description: posting.description,
-        location: posting.location,
-        price: posting.price,
-        serviceType: posting.serviceType,
-        category: posting.category,
-        postingImageUrl: posting.postingImageUrl,
-        postingUID: posting.postingUID,
-        buyerUID: auth.currentUser.uid,
+        postingId: id,
+        postingName: posting.postingName || '',
+        description: posting.description || '',
+        location: posting.location || '',
+        price: posting.price || 0,
+        serviceType: posting.serviceType || '',
+        category: posting.category || '',
+        postingImageUrl: posting.postingImageUrl || '',
+        postingUID: posting.postingUID || '',
+        buyerUID: auth.currentUser.uid || '',
         createdAt: new Date().toISOString(),
       };
       await addDoc(collection(db, "orders"), order);
 
       // Delete the posting from the postings document
-      await deleteDoc(doc(db, "postings", posting.id));
+      await deleteDoc(doc(db, "postings", id));
+
+      alert("Payment successful. Posting has been stored and deleted.");
 
       console.log("Posting successfully stored and deleted.");
+
+      navigate("/posting-list");
     } catch (error) {
       console.error("Error storing or deleting posting: ", error);
     }
