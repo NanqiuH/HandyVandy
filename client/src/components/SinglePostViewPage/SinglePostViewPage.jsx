@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom"; 
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc, addDoc, collection } from "firebase/firestore";
 import { db, auth, storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Header from "../Layout/Header";
@@ -167,12 +167,46 @@ function SinglePostingPage() {
 
       const session = await response.json();
       const stripe = await stripePromise;
-      await stripe.redirectToCheckout({ sessionId: session.id });
+      const result = await stripe.redirectToCheckout({ sessionId: session.id });
+
+      if (result.error) {
+        console.error('Error during checkout:', result.error);
+        alert('Failed to initiate checkout.');
+      } else {
+        // On successful payment
+        handlePaymentSuccess(posting);
+      }
     } catch (error) {
       console.error('Error during checkout:', error);
       alert('Failed to initiate checkout.');
     }
-    // alert(`You have purchased: ${posting.postingName}`);
+  };
+
+  // Function to handle payment success
+  const handlePaymentSuccess = async (posting) => {
+    try {
+      // Add posting information to Firebase
+      const order = {
+        postingId: posting.id,
+        postingName: posting.postingName,
+        description: posting.description,
+        price: posting.price,
+        serviceType: posting.serviceType,
+        category: posting.category,
+        postingImageUrl: posting.postingImageUrl,
+        postingUID: posting.postingUID,
+        buyerUID: auth.currentUser.uid,
+        createdAt: new Date().toISOString(),
+      };
+      await addDoc(collection(db, "orders"), order);
+
+      // Delete the posting from the postings document
+      await deleteDoc(doc(db, "postings", posting.id));
+
+      console.log("Posting successfully stored and deleted.");
+    } catch (error) {
+      console.error("Error storing or deleting posting: ", error);
+    }
   };
 
   const handleMessage = () => {
