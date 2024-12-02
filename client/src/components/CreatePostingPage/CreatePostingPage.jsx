@@ -137,6 +137,7 @@ function CreatePostingPage() {
       await addDoc(collection(db, "postings"), {
         postingName: formData.postingName,
         description: formData.description,
+        location: location,
         price: formData.price,
         postingImageUrl: postingImageUrl, // Image URL (if uploaded)
         serviceType: formData.serviceType,
