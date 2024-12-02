@@ -13,6 +13,7 @@
   padding: 8px;
   padding-right: 9rem;
   margin-bottom: 0.8rem;
+  height: 40px;
 }
 
 .inputIcon {
@@ -33,6 +34,10 @@
   background: transparent;
   border: none;
   width: 100%;
+}
+
+.iconButton {
+  margin-left: 8px; /* Adjust as needed */
 }
 
 .showPasswordButton {
