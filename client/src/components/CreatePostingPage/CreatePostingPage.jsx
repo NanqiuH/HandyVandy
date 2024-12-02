@@ -7,6 +7,9 @@ import { collection, addDoc } from "firebase/firestore"; // Firestore functions 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase storage functions to handle image upload
 import CategoryOptions from "../../options/CategoryOptions";
 import ServiceTypeOptions from "../../options/ServiceOptions";
+import { LoadScript, Autocomplete } from '@react-google-maps/api';
+
+const libraries = ['places'];
 
 function CreatePostingPage() {
   // State to manage form data
@@ -18,6 +21,8 @@ function CreatePostingPage() {
     serviceType: "None", // Default value for Service Type
     category: "None", // Default value for Category
   });
+  const [location, setLocation] = useState('');
+  const [autocomplete, setAutocomplete] = useState(null);
 
   // State to manage validation errors
   const [serviceTypeError, setServiceTypeError] = useState(false);
@@ -41,6 +46,17 @@ function CreatePostingPage() {
     if (name === "postingName") setPostingNameError(false);
     if (name === "description") setDescriptionError(false);
     if (name === "price") setPriceError(false);
+  };
+
+  const handleLocationChange = (e) => {
+    setLocation(e.target.value);
+  };
+
+  const handlePlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      setLocation(place.formatted_address);
+    }
   };
 
   // Function to handle image file upload
@@ -136,6 +152,7 @@ function CreatePostingPage() {
   };
 
   return (
+    <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={libraries}>
     <div>
       <Header />
       <main className={styles.postingCreatePage}>
@@ -186,6 +203,22 @@ function CreatePostingPage() {
                       Please enter a description.
                     </span>
                   )}
+                </div>
+
+                <div className={styles.input}>
+                  <label htmlFor="location">Location (optional):</label>
+                  <Autocomplete
+                    onLoad={(autocomplete) => setAutocomplete(autocomplete)}
+                    onPlaceChanged={handlePlaceChanged}
+                  >
+                    <input
+                      type="text"
+                      id="location"
+                      value={location}
+                      onChange={handleLocationChange}
+                      placeholder="Enter your location"
+                    />
+                  </Autocomplete>
                 </div>
 
                 {/* Price, Service Type, and Category Fields Side by Side */}
@@ -286,6 +319,7 @@ function CreatePostingPage() {
         </div>
       </main>
     </div>
+    </LoadScript>
   );
 }
 
