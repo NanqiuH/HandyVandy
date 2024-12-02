@@ -15,6 +15,7 @@ function CreateProfilePage() {
     middleName: "",
     lastName: "",
     bio: "",
+    cardNumber: "",
     profileImage: null,
     rating: 0,
     numRatings: 0,
@@ -134,6 +135,20 @@ function CreateProfilePage() {
                       value={formData.bio}
                       onChange={handleChange}
                       className={styles.textarea}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="card" className={styles.label}>
+                      Card Number
+                    </label>
+                    <input
+                      id="cardNumber"
+                      name="cardNumber"
+                      value={formData.cardNumber}
+                      onChange={handleChange}
+                      className={styles.input}
                       required
                     />
                   </div>

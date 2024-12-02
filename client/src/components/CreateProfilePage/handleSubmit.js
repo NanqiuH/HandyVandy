@@ -25,6 +25,7 @@ const handleSubmit = async (e, formData, navigate) => {
       middleName: formData.middleName,
       lastName: formData.lastName,
       bio: formData.bio,
+      cardNumber: formData.cardNumber,
       profileImageUrl: profileImageUrl,
       rating: formData.rating,
       numRatings: formData.numRatings,
