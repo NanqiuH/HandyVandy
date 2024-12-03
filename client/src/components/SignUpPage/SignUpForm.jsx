@@ -94,6 +94,12 @@ function SignUpForm() {
         </IconButton>
       </div>
       <button className={styles.signUpButton} type="submit">Sign Up</button>
+      <p className={styles.registerPrompt}>
+        Already have an account?{" "}
+        <a href="/" className={styles.registerLink}>
+          Login
+        </a>
+      </p>
     </form>
   );
 }
