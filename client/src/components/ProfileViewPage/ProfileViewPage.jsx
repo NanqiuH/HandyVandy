@@ -375,6 +375,14 @@ function ProfileViewPage() {
                 View Friends
               </button>
             )}
+            {isOwner && (
+              <button
+                onClick={() => navigate(`/history/${id}`)}
+                className={styles.historyButton}
+              >
+                View Purchase/Selling History
+              </button>
+            )}
             {isOwner && requesterProfiles.length > 0 && (
               <>
                 <h3>Friend Requests</h3>
@@ -485,7 +493,7 @@ function ProfileViewPage() {
                 <p className={styles.bio}>{profile.bio}</p>
               )}
 
-              <h3 className={styles.postsTitle}>Posts</h3>
+              <h3 className={styles.postsTitle}>Active Posts</h3>
               {postings.length > 0 ? (
                 <div className={styles.postsList}>
                   {postings.map((posting) => {

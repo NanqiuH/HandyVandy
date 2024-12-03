@@ -46,7 +46,7 @@ function SinglePostingPage() {
       try {
         const docRef = doc(db, "postings", id);
         const docSnap = await getDoc(docRef);
-  
+
         if (docSnap.exists()) {
           const postingData = docSnap.data();
           setPosting(postingData);
@@ -59,14 +59,14 @@ function SinglePostingPage() {
             category: postingData.category,
             postingImage: null,
           });
-  
+
           const currentUser = auth.currentUser;
           setIsOwner(currentUser && currentUser.uid === postingData.postingUID);
-  
+
           if (postingData.postingUID) {
             const userDocRef = doc(db, "profiles", postingData.postingUID);
             const userDocSnap = await getDoc(userDocRef);
-  
+
             if (userDocSnap.exists()) {
               setUser(userDocSnap.data());
             } else {
@@ -188,9 +188,17 @@ function SinglePostingPage() {
   };
 
   const handlePurchase = async () => {
-    if(posting.serviceType === "requesting" || posting.serviceType === "requesting-with-delivery") {
+    if (parseInt(posting.price, 10) === 0) {
+      // if the price is 0, automatically purchase
       handlePaymentSuccess(posting);
-      return ;
+      return;
+    }
+    if (
+      posting.serviceType === "requesting" ||
+      posting.serviceType === "requesting-with-delivery"
+    ) {
+      handlePaymentSuccess(posting);
+      return;
     }
     try {
       const response = await fetch(
@@ -200,7 +208,10 @@ function SinglePostingPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ postingName: posting.postingName, price: posting.price }),
+          body: JSON.stringify({
+            postingName: posting.postingName,
+            price: posting.price,
+          }),
         }
       );
 
@@ -227,19 +238,31 @@ function SinglePostingPage() {
 
   // Function to handle payment success
   const handlePaymentSuccess = async (posting) => {
+    console.log("Payment successful. Storing posting and deleting.");
     try {
+      // Fetch buyer's profile information
+      const buyerUID = auth.currentUser.uid;
+      const buyerDocRef = doc(db, "profiles", buyerUID);
+      const buyerDocSnap = await getDoc(buyerDocRef);
+      const buyerData = buyerDocSnap.exists() ? buyerDocSnap.data() : {};
+
       // Add posting information to Firebase
       const order = {
         postingId: id,
-        postingName: posting.postingName || '',
-        description: posting.description || '',
-        location: posting.location || '',
+        postingName: posting.postingName || "",
+        description: posting.description || "",
+        location: posting.location || "",
         price: posting.price || 0,
-        serviceType: posting.serviceType || '',
-        category: posting.category || '',
-        postingImageUrl: posting.postingImageUrl || '',
-        postingUID: posting.postingUID || '',
-        buyerUID: auth.currentUser.uid || '',
+        serviceType: posting.serviceType || "",
+        category: posting.category || "",
+        postingImageUrl: posting.postingImageUrl || "",
+        postingUID: posting.postingUID || "",
+        sellerName: user ? `${user.firstName} ${user.lastName}` : "",
+        sellerUID: posting.postingUID || "",
+        buyerUID: buyerUID,
+        buyerName: buyerData
+          ? `${buyerData.firstName} ${buyerData.lastName}`
+          : "",
         createdAt: new Date().toISOString(),
       };
       await addDoc(collection(db, "orders"), order);
