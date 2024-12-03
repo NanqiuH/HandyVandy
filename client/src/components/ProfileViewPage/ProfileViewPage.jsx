@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   doc,
   getDoc,
@@ -16,7 +16,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./ProfileViewPage.module.css";
 import Header from "../Layout/Header";
 import anonProfile from "../../images/anon_profile.png";
-import { PestControlSharp } from "@mui/icons-material";
+import HandyVandyLogo from "../../images/HandyVandyV.png";
 
 function ProfileViewPage() {
   const { id } = useParams();
@@ -25,6 +25,7 @@ function ProfileViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [postings, setPostings] = useState([]);
   const [receiverFullName, setReceiverFullName] = useState("");
   const { id: receiverId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
@@ -81,6 +82,17 @@ function ProfileViewPage() {
             ...doc.data(),
           }));
           setReviews(fetchedReviews);
+
+          const postingsQuery = query(
+            collection(db, "postings"),
+            where("postingUID", "==", id)
+          );
+          const postingsSnapshot = await getDocs(postingsQuery);
+          const fetchedPostings = postingsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setPostings(fetchedPostings);
 
           const currentUser = auth.currentUser;
           setIsOwner(currentUser && currentUser.uid === id);
@@ -262,6 +274,17 @@ function ProfileViewPage() {
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setReviews(fetchedReviews);
+
+          const postingsQuery = query(
+            collection(db, "postings"),
+            where("postingUID", "==", id)
+          );
+          const postingsSnapshot = await getDocs(postingsQuery);
+          const fetchedPostings = postingsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setPostings(fetchedPostings);
 
           const currentUser = auth.currentUser;
           setIsOwner(currentUser && currentUser.uid === id); // Only allow editing if the user is the owner
@@ -463,14 +486,68 @@ function ProfileViewPage() {
               )}
 
               <h3 className={styles.postsTitle}>Posts</h3>
-              {profile.posts && profile.posts.length > 0 ? (
-                <ul className={styles.postsList}>
-                  {profile.posts.map((post) => (
-                    <li key={post.id} className={styles.postItem}>
-                      {post.title} - ${post.price}
-                    </li>
-                  ))}
-                </ul>
+              {postings.length > 0 ? (
+                <div className={styles.postsList}>
+                  {postings.map((posting) => {
+                    const postingImageUrl =
+                      posting.postingImageUrl || HandyVandyLogo;
+                    let serviceTypeClass;
+                    if (posting.serviceType === "offering") {
+                      serviceTypeClass = styles.offeringStyle;
+                    } else if (posting.serviceType === "requesting") {
+                      serviceTypeClass = styles.requestingStyle;
+                    } else if (
+                      posting.serviceType === "requesting-with-delivery"
+                    ) {
+                      serviceTypeClass = styles.request_delivery;
+                    } else if (
+                      posting.serviceType === "offering-with-delivery"
+                    ) {
+                      serviceTypeClass = styles.offer_delivery;
+                    }
+                    return (
+                      <Link
+                        to={`/posting/${posting.id}`}
+                        key={posting.id}
+                        className={styles.postingLink}
+                      >
+                        <div
+                          className={`${styles.postItem} ${serviceTypeClass}`}
+                        >
+                          <img
+                            src={postingImageUrl}
+                            alt={posting.postingName}
+                            className={styles.postingImage}
+                          />
+                          <div className={styles.postingCardContent}>
+                            <h2 className={styles.postingName}>
+                              {posting.postingName}
+                            </h2>
+                            <p className={styles.postingDescription}>
+                              {posting.description}
+                            </p>
+                            <p className={styles.postingPrice}>
+                              Price: ${posting.price}
+                            </p>
+                            <p className={styles.postingType}>
+                              {posting.serviceType === "offering"
+                                ? "Offering"
+                                : posting.serviceType === "requesting"
+                                ? "Requesting"
+                                : posting.serviceType ===
+                                  "offering-with-delivery"
+                                ? "Offering with Delivery"
+                                : posting.serviceType ===
+                                  "requesting-with-delivery"
+                                ? "Requesting with Delivery"
+                                : ""}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               ) : (
                 <p>No posts available.</p>
               )}
