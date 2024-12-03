@@ -493,7 +493,7 @@ function ProfileViewPage() {
                 <p className={styles.bio}>{profile.bio}</p>
               )}
 
-              <h3 className={styles.postsTitle}>Posts</h3>
+              <h3 className={styles.postsTitle}>Active Posts</h3>
               {postings.length > 0 ? (
                 <div className={styles.postsList}>
                   {postings.map((posting) => {
