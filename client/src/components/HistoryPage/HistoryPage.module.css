@@ -1,0 +1,40 @@
+.historyPage {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    background-color: #f4f4f4;
+  }
+  
+  .historySection {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .historySection h2 {
+    margin-bottom: 10px;
+  }
+  
+  .historySection ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .historySection li {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .historySection li h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  .historySection li p {
+    margin: 5px 0;
+  }
+  

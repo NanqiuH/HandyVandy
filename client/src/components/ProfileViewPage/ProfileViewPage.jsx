@@ -375,6 +375,14 @@ function ProfileViewPage() {
                 View Friends
               </button>
             )}
+            {isOwner && (
+              <button
+                onClick={() => navigate(`/history/${id}`)}
+                className={styles.historyButton}
+              >
+                View Purchase/Selling History
+              </button>
+            )}
             {isOwner && requesterProfiles.length > 0 && (
               <>
                 <h3>Friend Requests</h3>

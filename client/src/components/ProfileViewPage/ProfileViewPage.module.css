@@ -306,3 +306,16 @@
 .request_delivery {
   background-color: #bfd1df;
 }
+
+.historyButton {
+  background-color: #c5b783;
+  color: #000;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.historyButton:hover {
+  background-color: #b59b5a;
+}
