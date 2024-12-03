@@ -362,19 +362,25 @@ function ProfileViewPage() {
                 `${profile.firstName} ${profile.middleName} ${profile.lastName}`
               )}
             </h1>
-            {isOwner && (
-              <button onClick={handleEditToggle} className={styles.editButton}>
-                {isEditing ? "Cancel" : "Edit Profile"}
-              </button>
-            )}
-            {isOwner && (
-              <button
-                onClick={handleViewFriendsList}
-                className={styles.viewFriendsButton}
-              >
-                View Friends
-              </button>
-            )}
+            </header>
+
+    
+    {/* Buttons below the reviews */}
+    {isOwner && (
+      <div className={styles.buttonGroup}>
+        <button onClick={handleEditToggle} className={styles.editButton}>
+          {isEditing ? "Cancel" : "Edit Profile"}
+        </button>
+        <button
+          onClick={handleViewFriendsList}
+          className={styles.viewFriendsButton}
+        >
+          View Friends
+        </button>
+      </div>
+    )}
+
+    
             {isOwner && requesterProfiles.length > 0 && (
               <>
                 <h3>Friend Requests</h3>
@@ -407,7 +413,7 @@ function ProfileViewPage() {
                 </ul>
               </>
             )}
-          </header>
+          
 
           <div className={styles.profileContent}>
             <div className={styles.profileSidebar}>
@@ -486,96 +492,73 @@ function ProfileViewPage() {
               )}
 
               <h3 className={styles.postsTitle}>Posts</h3>
-              {postings.length > 0 ? (
-                <div className={styles.postsList}>
-                  {postings.map((posting) => {
-                    const postingImageUrl =
-                      posting.postingImageUrl || HandyVandyLogo;
+{postings.length > 0 ? (
+               <div className={styles.postsList}>
+                {postings.map((posting) => {
+                  const postingImageUrl = posting.postingImageUrl || HandyVandyLogo;
                     let serviceTypeClass;
                     if (posting.serviceType === "offering") {
                       serviceTypeClass = styles.offeringStyle;
                     } else if (posting.serviceType === "requesting") {
                       serviceTypeClass = styles.requestingStyle;
-                    } else if (
-                      posting.serviceType === "requesting-with-delivery"
-                    ) {
+                    } else if (posting.serviceType === "requesting-with-delivery") {
                       serviceTypeClass = styles.request_delivery;
-                    } else if (
-                      posting.serviceType === "offering-with-delivery"
-                    ) {
+                    } else if (posting.serviceType === "offering-with-delivery") {
                       serviceTypeClass = styles.offer_delivery;
                     }
-                    return (
-                      <Link
-                        to={`/posting/${posting.id}`}
-                        key={posting.id}
-                        className={styles.postingLink}
-                      >
-                        <div
-                          className={`${styles.postItem} ${serviceTypeClass}`}
-                        >
-                          <img
-                            src={postingImageUrl}
-                            alt={posting.postingName}
-                            className={styles.postingImage}
-                          />
-                          <div className={styles.postingCardContent}>
-                            <h2 className={styles.postingName}>
-                              {posting.postingName}
-                            </h2>
-                            <p className={styles.postingDescription}>
-                              {posting.description}
-                            </p>
-                            <p className={styles.postingPrice}>
-                              Price: ${posting.price}
-                            </p>
-                            <p className={styles.postingType}>
-                              {posting.serviceType === "offering"
-                                ? "Offering"
-                                : posting.serviceType === "requesting"
-                                ? "Requesting"
-                                : posting.serviceType ===
-                                  "offering-with-delivery"
-                                ? "Offering with Delivery"
-                                : posting.serviceType ===
-                                  "requesting-with-delivery"
-                                ? "Requesting with Delivery"
-                                : ""}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p>No posts available.</p>
-              )}
+                      return (
+        <Link
+          to={`/posting/${posting.id}`}
+          key={posting.id}
+          className={styles.postingLink}
+        >
+          <div className={`${styles.postItem} ${serviceTypeClass}`}>
+  <img
+    src={postingImageUrl}
+    alt={posting.postingName}
+    className={styles.postingImage}
+  />
+  <div className={styles.postingCardContent}>
+    <h2 className={styles.postingName}>{posting.postingName}</h2>
+    <p className={styles.postingDescription}>{posting.description}</p>
+    
+  </div>
+</div>
 
-              <h3 className={styles.reviewsTitle}>Reviews</h3>
-              {reviews.length > 0 ? (
-                <ul className={styles.reviewsList}>
-                  {reviews.map((review) => (
-                    <li key={review.id} className={styles.reviewItem}>
-                      <div className={styles.reviewContent}>
-                        <p className={styles.reviewRating}>
-                          {"★".repeat(Math.round(review.rating)) +
-                            "☆".repeat(5 - Math.round(review.rating))}
-                        </p>
-                        <p className={styles.reviewComment}>{review.comment}</p>
-                        <p className={styles.reviewerName}>
-                          Posted by: {review.reviewerName || "Anonymous"}
-                        </p>
-                      </div>
-                      <p className={styles.reviewDate}>
-                        {new Date(review.createdAt).toLocaleString()}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No reviews yet.</p>
-              )}
+        </Link>
+      );
+    })}
+  </div>
+) : (
+  <p>No posts available.</p>
+)}
+{/* Reviews section */}
+<h3 className={styles.reviewsTitle}>Reviews</h3>
+    {reviews.length > 0 ? (
+      <ul className={styles.reviewsList}>
+        {reviews.map((review) => (
+          <li key={review.id} className={styles.reviewItem}>
+            <div className={styles.reviewContent}>
+              <p className={styles.reviewRating}>
+                {"★".repeat(Math.round(review.rating)) +
+                  "☆".repeat(5 - Math.round(review.rating))}
+              </p>
+              <p className={styles.reviewComment}>{review.comment}</p>
+              <p className={styles.reviewerName}>
+                Posted by: {review.reviewerName || "Anonymous"}
+              </p>
+            </div>
+            <p className={styles.reviewDate}>
+              {new Date(review.createdAt).toLocaleString()}
+            </p>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No reviews yet.</p>
+    )}
+
+              
 
               {isEditing && (
                 <button
